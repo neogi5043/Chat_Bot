@@ -1,0 +1,7 @@
+langchain-groq
+mysql-connector-python
+pandas
+gradio
+python-dotenv
+psycopg2
+SQLAlchemy
