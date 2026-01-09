@@ -5,3 +5,10 @@ gradio
 python-dotenv
 psycopg2
 SQLAlchemy
+
+langchain-core
+psycopg2-binary
+
+# Optional (if you want to add later)
+# redis>=4.5.0  # For persistent caching
+# sentence-transformers>=2.2.0  # For semantic similarity

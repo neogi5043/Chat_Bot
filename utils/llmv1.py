@@ -7,15 +7,8 @@ from dotenv import load_dotenv
 import db  # Import our local db.py file
 from prompt import INSIGHTS_GENERATION_PROMPT
 from sql_prompts import SQL_GENERATION_PROMPT
-import validation
-import cache
-import few_shot
 
 load_dotenv()
-
-# Initialize cache (lives for entire session)
-query_cache = cache.QueryCache(ttl_seconds=3600)  # 1 hour TTL
-
 
 def classify_intent(query):
     """Classifies user intent as 'sql_query' or 'general_conversation'"""
@@ -109,7 +102,6 @@ IMPORTANT:
     response = model.invoke(messages)
     return response.content
 
-
 def clean_sql(sql_text):
     """Removes Markdown fencing (```sql) from LLM output"""
     cleaned = re.sub(r"^```sql\s*|\s*```$", "", sql_text.strip(), flags=re.MULTILINE)
@@ -117,27 +109,11 @@ def clean_sql(sql_text):
 
 
 def generate_sql(query_request, user_email=None):
-    """
-    Generates SQL using Groq with improvements:
-    1. Checks cache first
-    2. Uses few-shot examples
-    3. Validates output
-    4. Auto-corrects if needed
-    """
+    """Generates SQL using Groq based on the DB schema"""
     
-    # STEP 1: Check cache
-    cached_sql = query_cache.get(query_request)
-    if cached_sql:
-        return cached_sql
-    
-    # STEP 2: Get schema
     db_structure = db.fetch_schema()
     
-    # STEP 3: Get relevant few-shot examples
-    relevant_examples = few_shot.get_relevant_examples(query_request)
-    examples_text = few_shot.format_examples(relevant_examples)
-    
-    # STEP 4: Format schema
+    # Format schema in a clearer way
     schema_text = "TABLES AND COLUMNS:\n"
     for table_name, columns in db_structure["tables"].items():
         schema_text += f"\n{table_name}:\n"
@@ -149,7 +125,6 @@ def generate_sql(query_request, user_email=None):
         for rel in db_structure["relationships"]:
             schema_text += f"  - {rel['from_table']}.{rel['from_column']} → {rel['to_table']}.{rel['to_column']}\n"
 
-    # STEP 5: Generate SQL
     model = ChatGroq(
         api_key=os.getenv("GROQ_API_KEY"),
         model="meta-llama/llama-4-maverick-17b-128e-instruct", 
@@ -162,12 +137,12 @@ def generate_sql(query_request, user_email=None):
         user_context = f"\n\nCurrent user email: {user_email}\nWhen the query references 'my' or 'I', filter by this email in the users/demands tables."
 
     human_prompt = f"""Database Schema:
-{schema_text}{examples_text}{user_context}
+{schema_text}{user_context}
 
 User Question:
 {query_request}
 
-Generate a PostgreSQL query following all the rules above. Return ONLY the SQL query with no explanations."""
+Generate a PostgreSQL query following all the rules above. CRITICAL: Verify which table each column belongs to before using it. Return ONLY the SQL query with no explanations."""
 
     messages = [
         SystemMessage(content=SQL_GENERATION_PROMPT),
@@ -175,78 +150,7 @@ Generate a PostgreSQL query following all the rules above. Return ONLY the SQL q
     ]
 
     response = model.invoke(messages)
-    sql_query = clean_sql(response.content)
-    
-    # STEP 6: Validate SQL
-    is_valid, errors = validation.validate_sql(sql_query, db_structure)
-    
-    if not is_valid:
-        print(f"[VALIDATION FAILED] Errors: {errors}")
-        
-        # Try auto-fix
-        fixed_sql = validation.attempt_fix(sql_query, errors, db_structure)
-        if fixed_sql:
-            print("[AUTO-FIX] Successfully corrected SQL")
-            sql_query = fixed_sql
-        else:
-            # Try one retry with error feedback
-            print("[RETRY] Attempting to regenerate SQL with error feedback")
-            sql_query = _retry_with_feedback(query_request, sql_query, errors, db_structure)
-    
-    # STEP 7: Cache the result
-    query_cache.set(query_request, sql_query)
-    
-    return sql_query
-
-
-def _retry_with_feedback(original_query, failed_sql, errors, db_structure):
-    """
-    Retry SQL generation with error feedback
-    Simple version - just one retry
-    """
-    schema_text = "TABLES:\n"
-    for table_name, columns in db_structure["tables"].items():
-        schema_text += f"\n{table_name}: {', '.join(columns.keys())}\n"
-    
-    model = ChatGroq(
-        api_key=os.getenv("GROQ_API_KEY"),
-        model="meta-llama/llama-4-maverick-17b-128e-instruct", 
-        temperature=0.01,
-        max_tokens=512
-    )
-    
-    correction_prompt = f"""You generated this SQL which has errors:
-
-{failed_sql}
-
-ERRORS FOUND:
-{chr(10).join([f"- {err}" for err in errors])}
-
-Database Schema:
-{schema_text}
-
-Original Question: {original_query}
-
-FIX the SQL to address these errors. Return ONLY the corrected SQL."""
-
-    messages = [
-        SystemMessage(content=SQL_GENERATION_PROMPT),
-        HumanMessage(content=correction_prompt)
-    ]
-    
-    response = model.invoke(messages)
-    corrected_sql = clean_sql(response.content)
-    
-    # Validate the corrected version
-    is_valid, new_errors = validation.validate_sql(corrected_sql, db_structure)
-    
-    if is_valid:
-        print("[RETRY SUCCESS] Corrected SQL is valid")
-        return corrected_sql
-    else:
-        print(f"[RETRY FAILED] Still has errors: {new_errors}")
-        # Return corrected version anyway - might work at execution
-        return corrected_sql
+    return clean_sql(response.content)
 
 
 def generate_insights(result_data, original_query=None):
@@ -288,13 +192,3 @@ Provide your answer now (1-2 sentences maximum with specific numbers):"""
     # 5. Invoke AI
     response = model.invoke(messages)
     return response.content
-
-
-def get_cache_stats():
-    """Get cache statistics - useful for monitoring"""
-    return query_cache.get_stats()
-
-
-def clear_cache():
-    """Clear the query cache - useful for testing"""
-    query_cache.clear()
