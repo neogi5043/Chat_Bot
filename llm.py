@@ -10,8 +10,6 @@ from sql_prompts import SQL_GENERATION_PROMPT
 
 load_dotenv()
 
-load_dotenv()
-
 def classify_intent(query):
     """Classifies user intent as 'sql_query' or 'general_conversation'"""
     
