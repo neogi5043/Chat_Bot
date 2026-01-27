@@ -86,12 +86,17 @@ def fetch_schema():
     conn.close()
     return db_structure
 
+from sqlalchemy import text  # Add this import at the top if missing
+
 def run_query(sql):
     """Executes SQL and returns a Pandas DataFrame"""
     engine = None
     try:
         engine = get_sqlalchemy_engine()
-        df = pd.read_sql(sql, engine)
+        # Use text() to safely handle special chars like % in ILIKE
+        # and prevent pandas/sqlalchemy from treating them as parameters
+        with engine.connect() as connection:
+            df = pd.read_sql(text(sql), connection)
         return df
     except Exception as e:
         print(f"Error running query: {e}")

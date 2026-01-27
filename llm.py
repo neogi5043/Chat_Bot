@@ -130,44 +130,69 @@ def generate_sql(query_request, user_email=None):
     if cached_sql:
         return cached_sql
     
-    # STEP 2: Get schema
+    # STEP 2: Use Semantic Layer (Load schema + valid values)
     db_structure = db.fetch_schema()
     
+    # Try to load semantic values
+    semantic_values = {}
+    try:
+        with open('semantic_schema.json', 'r') as f:
+            semantic_values = json.load(f)
+    except Exception:
+        pass  # It's okay if file doesn't exist yet
+
     # STEP 3: Get relevant few-shot examples
     relevant_examples = few_shot.get_relevant_examples(query_request)
     examples_text = few_shot.format_examples(relevant_examples)
     
-    # STEP 4: Format schema
+    # STEP 4: Format schema with valid values
     schema_text = "TABLES AND COLUMNS:\n"
     for table_name, columns in db_structure["tables"].items():
-        schema_text += f"\n{table_name}:\n"
+        schema_text += f"\nTABLE: {table_name}\n"
         for col_name, col_type in columns.items():
-            schema_text += f"  - {col_name} ({col_type})\n"
+            schema_text += f"  - {col_name} ({col_type})"
+            
+            # Inject valid values if available
+            if table_name in semantic_values and col_name in semantic_values[table_name]:
+                vals = semantic_values[table_name][col_name]
+                # Only show if not too many, or just show first 10
+                if len(vals) > 0:
+                    schema_text += f" -> Valid Values: {str(vals[:20])}"
+            schema_text += "\n"
     
     if db_structure["relationships"]:
-        schema_text += "\nTABLE RELATIONSHIPS (Foreign Keys):\n"
+        schema_text += "\nRELATIONSHIPS:\n"
         for rel in db_structure["relationships"]:
-            schema_text += f"  - {rel['from_table']}.{rel['from_column']} → {rel['to_table']}.{rel['to_column']}\n"
+            schema_text += f"  - {rel['from_table']}.{rel['from_column']} -> {rel['to_table']}.{rel['to_column']}\n"
 
-    # STEP 5: Generate SQL
+    # STEP 5: Generate SQL with Chain of Thought
     model = ChatGroq(
         api_key=os.getenv("GROQ_API_KEY"),
         model="meta-llama/llama-4-maverick-17b-128e-instruct", 
         temperature=0.01,
-        max_tokens=512
+        max_tokens=1024  # Increased for CoT
     )
 
     user_context = ""
     if user_email:
-        user_context = f"\n\nCurrent user email: {user_email}\nWhen the query references 'my' or 'I', filter by this email in the users/demands tables."
+        user_context = f"\n\nCurrent user email: {user_email}\nWhen the query references 'my' or 'I', filter by this email."
 
-    human_prompt = f"""Database Schema:
-{schema_text}{examples_text}{user_context}
+    human_prompt = f"""Database Schema & Valid Values:
+{schema_text}
+
+{examples_text}
+
+{user_context}
 
 User Question:
 {query_request}
 
-Generate a PostgreSQL query following all the rules above. Return ONLY the SQL query with no explanations."""
+Generate the SQL now."""
+
+    print("\n[DEBUG] Schema Context Sent to LLM:")
+    print("-" * 40)
+    print(schema_text) # Print FULL schema
+    print("-" * 40)
 
     messages = [
         SystemMessage(content=SQL_GENERATION_PROMPT),
@@ -175,7 +200,24 @@ Generate a PostgreSQL query following all the rules above. Return ONLY the SQL q
     ]
 
     response = model.invoke(messages)
-    sql_query = clean_sql(response.content)
+    
+    # Clean up response (extract SQL from CoT)
+    content = response.content
+    
+    # Method 1: Remove the /* ... */ block if it exists
+    # Non-greedy match for the comment block
+    sql_clean = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL).strip()
+    
+    # Method 2: If Method 1 left nothing or failed, try finding SELECT
+    if not sql_clean:
+         # Fallback: look for the part after reasoning
+        sql_match = re.search(r'(SELECT\s+.*)', content, re.IGNORECASE | re.DOTALL)
+        if sql_match:
+            sql_query = clean_sql(sql_match.group(1))
+        else:
+             sql_query = clean_sql(content)
+    else:
+        sql_query = clean_sql(sql_clean)
     
     # STEP 6: Validate SQL
     is_valid, errors = validation.validate_sql(sql_query, db_structure)

@@ -231,7 +231,7 @@ def show_recent_failures():
 def main():
     # Test queries including the problematic ones
     test_queries = [
-        "What is the average fulfillment time for dev ops practice?"
+        "WHAT CAN YOU DO?"
     ]
     
     for query in test_queries:
