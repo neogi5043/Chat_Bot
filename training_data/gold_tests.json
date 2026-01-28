@@ -1,0 +1,36 @@
+[
+    {
+        "id": 1,
+        "user_question": "What is the average project budget by department?",
+        "gold_sql": "SELECT d.department_name, AVG(p.amount) as avg_budget FROM departments d LEFT JOIN projects p ON d.id = p.department_id GROUP BY d.id, d.department_name ORDER BY avg_budget DESC",
+        "expected_result": [
+            {
+                "department_name": "Engineering",
+                "avg_budget": 150000.00
+            },
+            {
+                "department_name": "Sales",
+                "avg_budget": 80000.00
+            }
+        ],
+        "difficulty": "medium",
+        "sql_type": "JOIN, AGGREGATE, GROUP_BY",
+        "acceptable_time_ms": 500
+    },
+    {
+        "id": 2,
+        "user_question": "Find all demands for the account 'Google' with status 'Open'",
+        "gold_sql": "SELECT d.* FROM demand_details d JOIN account_details a ON d.account_id = a.account_id WHERE a.account_name = 'Google' AND d.status = 'Open'",
+        "difficulty": "medium",
+        "sql_type": "JOIN, WHERE",
+        "acceptable_time_ms": 500
+    },
+    {
+        "id": 3,
+        "user_question": "Count the number of candidates with 'Java' skills",
+        "gold_sql": "SELECT COUNT(*) FROM candidate_details WHERE skills ILIKE '%Java%'",
+        "difficulty": "easy",
+        "sql_type": "AGGREGATE, WHERE",
+        "acceptable_time_ms": 200
+    }
+]

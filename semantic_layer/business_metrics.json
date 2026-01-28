@@ -1,0 +1,21 @@
+{
+    "business_metrics": {
+        "project_budget_utilization": {
+            "name": "Project Budget Utilization",
+            "formula": "(consumed_amount / total_budget) * 100",
+            "required_tables": [
+                "projects"
+            ],
+            "definition": "Percentage of project budget spent",
+            "owner": "Finance"
+        },
+        "candidate_acceptance_rate": {
+            "name": "Candidate Acceptance Rate",
+            "formula": "COUNT(CASE WHEN status='Joined' THEN 1 END) / COUNT(*)",
+            "required_tables": [
+                "candidate_details"
+            ],
+            "definition": "Ratio of candidates who joined vs total candidates"
+        }
+    }
+}

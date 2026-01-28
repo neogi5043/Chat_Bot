@@ -66,180 +66,89 @@ def is_result_empty_or_null(df):
 
 
 
+from agents.orchestrator import TextToSQLOrchestrator
+
+# Initialize Global Orchestrator
+orchestrator = TextToSQLOrchestrator()
+
 def pipeline(query_request, verbose=True):
     """
-    Improved pipeline with:
-    1. Validation before execution
-    2. Better error handling
-    3. Execution monitoring
-    4. Empty/NULL result analysis and retry
+    New Entry Point: Delegates to TextToSQLOrchestrator.
     """
     start_time = time.time()
     
-    try:
-        # 1. Classify Intent
-        intent = llm.classify_intent(query_request)
-        
-        # 2. Handle based on intent
-        if intent == "general_conversation":
-            # Handle conversational queries without SQL
-            response = llm.handle_general_conversation(query_request)
-            return None, None, response, "general"
-        
-        # 3. For SQL queries, proceed with improved flow
-        if verbose: print("\n[PIPELINE] Generating SQL...")
-        sql_query = llm.generate_sql(query_request)
-        
-        if not sql_query or len(sql_query.strip()) == 0:
-            error_msg = "Failed to generate SQL query"
-            logger.log(query_request, sql_query, False, error_msg)
-            err_df = pd.DataFrame([[error_msg]], columns=["Error"])
-            return None, err_df, None, "error"
-
-        # 4. Run SQL with error handling
-        if verbose: print("[PIPELINE] Executing SQL...")
-        try:
-            df = db.run_query(sql_query)
-        except Exception as exec_error:
-            error_msg = f"SQL Execution Error: {str(exec_error)}"
-            if verbose: print(f"[ERROR] {error_msg}")
-            
-            exec_time = (time.time() - start_time) * 1000
-            logger.log(query_request, sql_query, False, error_msg, exec_time)
-            
-            err_df = pd.DataFrame([[error_msg]], columns=["Error"])
-            return sql_query, err_df, None, "error"
-
-        # 5. Handle empty OR NULL results with intelligent retry
-        if is_result_empty_or_null(df):
-            if verbose: print("[EMPTY/NULL RESULT] Analyzing why query returned no usable results...")
-            
-            # Get schema for analysis
-            db_structure = db.fetch_schema()
-            
-            # Try to suggest a better query
-            suggested_sql, explanation = analyzer.analyze_empty_result(
-                sql_query, 
-                db_structure,
-                db_connection=db.get_sqlalchemy_engine()
-            )
-            
-            if suggested_sql and suggested_sql != sql_query:
-                if verbose:
-                    print(f"[RETRY] {explanation}")
-                    print(f"[RETRY] Trying improved query...")
-                    print(f"[RETRY SQL] {suggested_sql[:200]}...")
-                
-                try:
-                    df_retry = db.run_query(suggested_sql)
-                    
-                    # Check if retry gave us better results
-                    if df_retry is not None and not is_result_empty_or_null(df_retry):
-                        if verbose: print(f"[RETRY SUCCESS] Found results with improved query!")
-                        
-                        exec_time = (time.time() - start_time) * 1000
-                        logger.log(query_request, suggested_sql, True, None, exec_time, 
-                                 retry_info={"original_sql": sql_query, "reason": explanation})
-                        
-                        # Generate insights with the successful query
-                        insights = llm.generate_insights(df_retry, original_query=query_request)
-                        
-                        # Add explanation about the correction
-                        insights = f"{insights}\n\n(Note: Used fuzzy matching to find closest match)"
-                        
-                        return suggested_sql, df_retry, insights, "sql"
-                    else:
-                        if verbose: print("[RETRY] Still no usable results with improved query")
-                        
-                except Exception as retry_error:
-                    if verbose: print(f"[RETRY FAILED] {str(retry_error)}")
-            
-            # If retry didn't work, provide helpful feedback
-            exec_time = (time.time() - start_time) * 1000
-            logger.log(query_request, sql_query, True, None, exec_time)
-            
-            # LOG FEEDBACK (PENALIZE) - Empty result is likely a strict/bad query
-            llm.feedback_manager.log_feedback(query_request, sql_query, False, "Returned empty/null result")
-            
-            # Try to get available values to show user
-            where_values = analyzer.extract_where_values(sql_query)
-            
-            message = "Query executed but returned no results. "
-            
-            if where_values and db.get_sqlalchemy_engine():
-                for column, value in where_values[:20]:  # Show feedback for first 20 columns
-                    try:
-                        available = analyzer.get_available_values(
-                            db.get_sqlalchemy_engine(),
-                            sql_query,
-                            column,
-                            db_structure,
-                            limit=10
-                        )
-                        if available:
-                            col_display = column.split('.')[-1] if '.' in column else column
-                            message += f"\n\nAvailable {col_display} values: {', '.join(map(str, available[:5]))}"
-                            if len(available) > 5:
-                                message += f" (and {len(available) - 5} more)"
-                    except Exception as e:
-                        if verbose: print(f"Could not fetch available values: {e}")
-            
-            df = pd.DataFrame([[message]], columns=["Message"])
-            return sql_query, df, None, "sql"
-
-        # 6. Generate Insights for successful queries
-        if verbose: print("[PIPELINE] Generating insights...")
-        insights = llm.generate_insights(df, original_query=query_request)
-        
-        # Log success
-        exec_time = (time.time() - start_time) * 1000
-        logger.log(query_request, sql_query, True, None, exec_time)
-        
-        # LOG FEEDBACK (GRATIFY)
-        llm.feedback_manager.log_feedback(query_request, sql_query, True)
-        
-        if verbose: print(f"[SUCCESS] Query completed in {exec_time:.0f}ms")
-
-        return sql_query, df, insights, "sql"
+    if verbose:
+        print(f"\n[PIPELINE] Processing: {query_request}")
     
+    # 1. Intent Classification (Legacy check for greeting)
+    # We can keep using llm.classify_intent or better, force the orchestrator to handle it.
+    # For now, let's fast-track greetings to keep it cheap.
+    intent = llm.classify_intent(query_request)
+    if intent == "general_conversation":
+         response = llm.handle_general_conversation(query_request)
+         return None, None, response, "general"
+
+    # Delegate to Orchestrator
+    try:
+        response = orchestrator.process_query(query_request)
+        
+        duration = time.time() - start_time
+        
+        if response["success"]:
+            # Success
+            result_data = response["data"]
+            sql_query = response["sql"]
+            
+            # Convert to DataFrame for app.py compatibility
+            df = pd.DataFrame(result_data) if result_data else pd.DataFrame()
+            
+            # Generate insights
+            if verbose: print("[PIPELINE] Generating insights...")
+            from llm import generate_insights
+            insight = generate_insights(result_data, query_request)
+            
+            if verbose:
+                print(f"[PIPELINE] Success in {duration:.2f}s")
+            
+            return sql_query, df, insight, "sql"
+            
+        else:
+            # Failure
+            error_msg = response.get("error", "Unknown error")
+            sql = response.get("sql", "")
+            if verbose:
+                print(f"[PIPELINE] Failed: {error_msg}")
+            
+            err_df = pd.DataFrame([[error_msg]], columns=["Error"])
+            return sql, err_df, None, "error"
+
     except Exception as e:
-        error_msg = f"Pipeline Error: {str(e)}"
-        if verbose: print(f"[ERROR] {error_msg}")
-        
-        exec_time = (time.time() - start_time) * 1000
-        logger.log(query_request, "", False, error_msg, exec_time)
-        
-        # LOG FEEDBACK (PENALIZE) - If we have a generated SQL but execution failed
-        if 'sql_query' in locals() and sql_query:
-            llm.feedback_manager.log_feedback(query_request, sql_query, False, error_msg)
-        
-        err_df = pd.DataFrame([[error_msg]], columns=["Error"])
-        return None, err_df, None, "error"
+        print(f"[PIPELINE] Critical Error: {e}")
+        err_df = pd.DataFrame([[str(e)]], columns=["Error"])
+        return "", err_df, None, "error"
 
 
 def get_stats():
-    """Get pipeline statistics"""
+    """
+    Returns system statistics.
+    """
     return {
-        "query_stats": logger.get_stats(),
-        "cache_stats": llm.get_cache_stats(),
-        "learning_stats": llm.feedback_manager.get_score_stats()
+        "cache_hits": 0,
+        "feedback_count": len(orchestrator.feedback_manager.history),
+        "few_shot_count": len(orchestrator.feedback_manager.few_shots)
     }
 
-
 def show_recent_failures():
-    """Show recent failures for debugging"""
-    failures = logger.get_recent_failures()
+    """Show recent failures (from FeedbackManager)"""
+    failures = orchestrator.feedback_manager.get_similar_feedback("", top_k=5)[1] # get incorrect
     if not failures:
-        print("No recent failures!")
+        print("No recent failures logged.")
         return
-    
-    print("\nRECENT FAILURES:")
-    print("=" * 80)
-    for i, failure in enumerate(failures, 1):
-        print(f"\n{i}. Query: {failure['query']}")
-        print(f"   SQL: {failure['sql'][:100]}...")
-        print(f"   Error: {failure['error']}")
-        print(f"   Time: {failure['timestamp']}")
+
+    print("\nRECENT FAILURES (from Feedback History):")
+    for f in failures:
+        print(f"- {f.get('query')}: {f.get('error')}")
+
 
 
 def main():

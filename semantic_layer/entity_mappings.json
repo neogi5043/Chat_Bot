@@ -1,0 +1,18 @@
+{
+    "entity_mappings": {
+        "project_names": {
+            "type": "categorical_values",
+            "source_table": "projects",
+            "source_column": "project_name",
+            "vector_embeddings": true,
+            "values": []
+        },
+        "skills": {
+            "type": "categorical_values",
+            "source_table": "candidate_details",
+            "source_column": "skills",
+            "vector_embeddings": true,
+            "values": []
+        }
+    }
+}

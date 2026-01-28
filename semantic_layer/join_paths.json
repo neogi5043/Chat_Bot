@@ -1,0 +1,11 @@
+{
+    "join_paths": {
+        "projects_to_department": {
+            "path": "projects.department_id -> departments.id",
+            "description": "Link projects to their owning department",
+            "join_conditions": [
+                "projects.department_id = departments.id"
+            ]
+        }
+    }
+}

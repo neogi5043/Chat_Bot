@@ -1,0 +1,19 @@
+{
+    "data_dictionary": {
+        "projects": {
+            "table_id": "projects",
+            "business_name": "Projects",
+            "description": "All company projects",
+            "columns": {
+                "amount": {
+                    "type": "DECIMAL",
+                    "business_term": "Project Budget"
+                },
+                "project_name": {
+                    "type": "VARCHAR",
+                    "business_term": "Project Name"
+                }
+            }
+        }
+    }
+}

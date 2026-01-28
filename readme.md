@@ -1,149 +1,144 @@
-# GenAI Chatbot for Demand Management System
+# Demand Management GenAI Chatbot
 
-A natural-language-to-SQL chatbot designed to query a PostgreSQL database, execute intelligent SQL queries, and provide data-driven insights. This system uses Groq (Meta Llama 3) for LLM capabilities.
+A production-grade Text-to-SQL system powered by a **Multi-Agent Architecture**. This chatbot allows users to query demand management data using natural language, leveraging advanced techniques like **Semantic Layers**, **Chain-of-Thought Decomposition**, and **Active Learning**.
 
-## 🚀 Features
+---
 
-- **Natural Language to SQL**: Converts user questions into accurate PostgreSQL queries.
-- **Intelligent Pipeline**:
-  - **Intent Classification**: Distinguishes between general conversation and data queries.
-  - **Schema Awareness & Semantic Layer**: Dynamically fetches database schema and uses a **Semantic Layer** to map vague terms of exact database values (e.g., "dev ops" -> "Cloud & DevOps").
-  - **Chain-of-Thought Reasoning**: The AI explains its logic before generating SQL, reducing errors.
-  - **Validation & Auto-Fix**: Validates generated SQL and attempts to auto-correct errors.
-  - **Empty Result Analysis**: Automatically analyzes why a query returned no data and suggests fuzzy-match alternatives.
-- **Caching**: Implements query caching to reduce latency and API costs.
-- **Insights Generation**: Summarizes query results into concise, metric-focused insights.
-- **Robust Error Handling**: Handles SQL execution errors and retry logic gracefully.
+## 🏗️ Architecture Overview
 
-## 🛠️ Architecture
+The system has moved away from a monolithic LLM call to a modular **Agent Swarm**. Each agent is responsible for a specific stage of the pipeline, orchestrated by the `TextToSQLOrchestrator`.
 
-The project is structured around a modular pipeline:
+### High-Level Data Flow
 
-1.  **`chatbot.py`**: Main entry point and orchestration pipeline. Handles logging, retry logic, and result presentation.
-2.  **`llm.py`**: Manages all interactions with the Groq API (Intent, SQL generation, Insights) and injects the Semantic Layer.
-3.  **`db.py`**: Database layer for connection management, schema introspection, and query execution.
-4.  **`semantic_builder.py`**: **[NEW]** Scans the database to build `semantic_schema.json`, enabling exact value matching.
-5.  **`validation.py`**: SQL validation rules to ensure safe and correct queries.
-6.  **`post_execution_analyzer.py`**: Analyzes empty or null results to improve query accuracy.
-7.  **`sql_prompts.py`**: Contains the Chain-of-Thought system prompts.
-8.  **`cache.py`**: Simple in-memory caching for generated queries.
+![Architecture Diagram](architecture_diagram.png)
 
-## 📋 Prerequisites
+```mermaid
+graph TD
+    User[User Query] --> Orch[TextToSQL Orchestrator]
+    
+    subgraph "Phase 1: Understanding"
+        Orch --> Sem[Semantic Layer]
+        Orch --> Sel[Schema Selector]
+        Orch --> Ent[Entity Resolver]
+    end
+    
+    subgraph "Phase 2: Planning & Generation"
+        Orch --> Dec[Decomposer Agent]
+        Dec --> Plan[Query Plan]
+        Plan --> Gen[SQL Generator Agent]
+        Gen --> SQL[Raw SQL]
+    end
+    
+    subgraph "Phase 3: Validation & Execution"
+        SQL --> Val[Validator Agent]
+        Val -- Valid --> Exec[Execution Engine]
+        Val -- Invalid --> Corr[Correction Agent]
+        Exec -- Error --> Corr
+        Corr -- Fix --> Exec
+    end
+    
+    subgraph "Phase 4: Learning"
+        Exec --> Feed[Feedback Manager]
+        Feed --> FewShot[Few-Shot Store]
+        FewShot --> Gen
+    end
 
-- **Python** 3.8 or higher
-- **PostgreSQL** Database
-- **Groq API Key** (for LLM access)
+    Exec --> Insight[Insight Generator]
+    Insight --> Final[Final Response]
+```
 
-## 📦 Installation
+---
 
-1.  **Clone the repository**
-    ```bash
-    git clone <repository_url>
-    cd Genai_chatbot
-    ```
+## 🧠 Core Components
 
-2.  **Create and activate a virtual environment**
-    ```bash
-    python -m venv .venv
-    # Windows
-    .venv\Scripts\activate
-    # Linux/Mac
-    source .venv/bin/activate
-    ```
+### 1. The Semantic Layer (`agents/semantic_layer.py`)
+The "Brain" of the system. It abstracts the raw database schema into business concepts.
+- **`business_metrics.json`**: Defines formulas (e.g., "Attrition Rate = Terminations / Headcount").
+- **`entity_mappings.json`**: Maps fuzzy terms to canonical DB values (e.g., "GenAI Initiative" → "Project ID 501").
+- **`join_paths.json`**: Pre-defined safe join paths to avoid cartesian products.
 
-3.  **Install dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
+### 2. The Agent Swarm (`agents/`)
 
-4.  **Configure Environment Variables**
-    Create a `.env` file in the root directory with your credentials:
+| Agent | Responsibility |
+|-------|----------------|
+| **SchemaSelector** | Filters the 50+ table schema down to the top-K relevant tables using simulated vector search. |
+| **EntityResolver** | Detects named entities (projects, people) in the user query and maps them to IDs using fuzzy matching. |
+| **Decomposer** | Breaks down name, complex questions (e.g., "Compare X and Y") into logical steps. |
+| **SQLGenerator** | Writes the SQL. Uses strict **Chain-of-Thought** logic and injects relevant **Few-Shot Examples**. |
+| **Validator**| Runs `EXPLAIN` and Regex checks to catch syntax errors and logic hallucinations before execution. |
+| **ExecutionEngine** | Safely runs the query with timeouts and error formatting. |
+| **CorrectionAgent** | If Validation or Execution fails, this agent analyzes the error and attempts to rewrite the SQL automatically. |
+| **Orchestrator** | (`orchestrator.py`) Wires all agents together, managing the data flow and error handling loops. |
 
-    ```ini
-    # Database Configuration
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_NAME=your_db_name
-    DB_USER=your_username
-    DB_PASSWORD=your_password
+### 3. Active Learning Loop (`agents/feedback_manager.py`)
+The system gets smarter over time.
+- **Logging**: Every query (Success/Failure) is logged to `feedback_history.json`.
+- **Dynamic Few-Shot**: When generating SQL, the `SQLGenerator` looks up past similar successful queries to use as examples.
+- **Correction**: If a user flagged a query as wrong, the system ensures it helps avoiding that mistake in the future.
 
-    # LLM API
-    GROQ_API_KEY=gsk_...
-    ```
+---
 
-## 🚀 Usage
+## 🚀 Getting Started
 
-### 1. Build the Semantic Layer (Important!)
-Before running the chatbot, scan your database to map valid values:
+### Prerequisites
+- Python 3.9+
+- PostgreSQL Database
+- Groq API Key (for LLM inference)
 
+### Installation
+1. Clone the repository.
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Set up environment variables in `.env`:
+   ```ini
+   GROQ_API_KEY=gsk_...
+   DB_HOST=localhost
+   DB_NAME=demand_db
+   DB_USER=postgres
+   DB_PASSWORD=password
+   ```
+
+### Running the Chatbot
+To start the interactive CLI:
 ```bash
-python semantic_builder.py
+python app.py
 ```
-*Run this occasionally when your data changes (e.g., new departments or status types).*
 
-### 2. Run the Chatbot
-To run the chatbot in CLI mode:
-
+### Running Tests
+To verify the architecture integrity:
 ```bash
-python chatbot.py
+python verify_orchestrator.py
 ```
 
-The script will execute a predefined set of test queries (configured in `main()` function) and display:
-1.  **Thinking Process** (Chain of Thought)
-2.  Generated SQL
-3.  Query Results (DataFrame)
-4.  AI-Generated Insights
-5.  Execution Statistics
+---
 
-### Example Output
+## 📂 Directory Structure
 
-```text
-QUERY: No of demands created per month in last 6 months
-
-[DEBUG] Schema Context Sent to LLM:
-----------------------------------------
-TABLE: demands
-  - status -> Valid Values: ['Open', 'Cancelled', 'Pending', 'Fulfilled']
-...
-
-Generated SQL:
-/* Reasoning: 
-1. Group by month of created_at...
-2. Filter for last 6 months...
-*/
-SELECT EXTRACT(MONTH FROM created_at) as month, COUNT(*) ...
-
-Results:
-   month  count
-0    9.0     12
-1   10.0      5
-...
+```
+C:\PROJECT\INTERNAL\GENAI_CHATBOT
+├── agents/                  # <--- NEW Multi-Agent Package
+│   ├── orchestrator.py      # Main pipeline controller
+│   ├── semantic_layer.py    # Interface to JSON definitions
+│   ├── schema_selector.py   # RAG for constraints/tables
+│   ├── entity_resolver.py   # Named Entity Recognition
+│   ├── decomposer.py        # Query Planner
+│   ├── sql_generator.py     # Code writer
+│   ├── validator.py         # Code reviewer
+│   ├── execution_engine.py  # Runtime
+│   ├── correction_agent.py  # Auto-fixer
+│   └── feedback_manager.py  # Active Learning
+├── semantic_layer/          # JSON Definitions
+│   ├── business_metrics.json
+│   ├── data_dictionary.json
+│   └── entity_mappings.json
+├── app.py                   # Main Entry Point
+├── chatbot.py               # Integration layer
+├── llm.py                   # Legacy LLM functions (deprecated logic)
+└── requirements.txt
 ```
 
-## 📂 Project Structure
+---
 
-```text
-.
-├── chatbot.py                 # Main pipeline and CLI entry point
-├── llm.py                     # LLM integration (Groq) & prompt management
-├── db.py                      # Database connection & provided schema fetching
-├── semantic_builder.py        # [NEW] Builds the semantic value map
-├── semantic_schema.json       # [Auto-Generated] Valid values for the LLM
-├── sql_prompts.py             # [NEW] System prompts for SQL generation
-├── prompt.py                  # System prompts for insights
-├── input_prompts.py           # Example inputs
-├── cache.py                   # Caching utility
-├── validation.py              # SQL validation logic
-├── few_shot.py                # Few-shot example retrieval
-├── post_execution_analyzer.py # Logic for analyzing empty results
-├── requirements.txt           # Python dependencies
-└── .env                       # Environment variables (not committed)
-```
-
-## 🔧 Troubleshooting
-
-- **Database Connection Error**: Verify your `.env` credentials and ensure the PostgreSQL service is running.
-- **Empty Results**: 
-  - Check if `semantic_schema.json` is generated. If not, run `python semantic_builder.py`.
-  - The system attempts to explain empty results (e.g. "No fulfilled demands found").
-- **LLM Errors**: Ensure your `GROQ_API_KEY` is valid.
+#project-genai #text-to-sql #multi-agent
