@@ -1,0 +1,31 @@
+Show all demands with status 'Open'.
+Count the number of demands in 'USA'.
+List all candidates who have 'Java' in their skills.
+What is the email of the manager 'Komal Gupta'?
+Show me all demands for the account 'Verizon Communications'.
+How many candidates were selected for HR Interview?
+List demands with priority 'High' and location 'India'.
+Find the email of the user 'Sayan'.
+Show details of demand ID 72.
+List all 'Permanent' type hires.
+What are the practices available?
+Show the description for the 'Cloud & DevOps' practice.
+List all users with role 'ADMIN'.
+How many demands are 'Billable'?
+Show me the candidates with 'React' experience.
+List demands where the probability is 'High'.
+Who are the managers with the name 'Ankit Singh'?
+Show the job description for the demand with position 'AWS DEV'.
+List all candidates with 5 years of experience.
+What is the fitment reason for the candidate who was rejected?
+Show the latest demand activities.
+Find the resume URL for candidate 'Siddharth Dey'.
+List demands that are 'Remote'.
+How many candidates have applied for 'Java Developer' positions?
+Show me the list of cancelled demands.
+What is the current position of candidate 'Purbaja De'?
+List all accounts.
+Show the history of changes for Demand ID 88.
+Who updated the candidate profile for demand 66?
+List all demands with experience required '5-7 years'.
+What are the available cancellation reasons?

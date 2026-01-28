@@ -231,7 +231,7 @@ def show_recent_failures():
 def main():
     # Test queries including the problematic ones
     test_queries = [
-        "WHAT CAN YOU DO?"
+        "Who updated the candidate profile for demand 51?"
     ]
     
     for query in test_queries:
