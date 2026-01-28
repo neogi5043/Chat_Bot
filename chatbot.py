@@ -65,7 +65,8 @@ def is_result_empty_or_null(df):
     return False
 
 
-def pipeline(query_request):
+
+def pipeline(query_request, verbose=True):
     """
     Improved pipeline with:
     1. Validation before execution
@@ -86,7 +87,7 @@ def pipeline(query_request):
             return None, None, response, "general"
         
         # 3. For SQL queries, proceed with improved flow
-        print("\n[PIPELINE] Generating SQL...")
+        if verbose: print("\n[PIPELINE] Generating SQL...")
         sql_query = llm.generate_sql(query_request)
         
         if not sql_query or len(sql_query.strip()) == 0:
@@ -96,12 +97,12 @@ def pipeline(query_request):
             return None, err_df, None, "error"
 
         # 4. Run SQL with error handling
-        print("[PIPELINE] Executing SQL...")
+        if verbose: print("[PIPELINE] Executing SQL...")
         try:
             df = db.run_query(sql_query)
         except Exception as exec_error:
             error_msg = f"SQL Execution Error: {str(exec_error)}"
-            print(f"[ERROR] {error_msg}")
+            if verbose: print(f"[ERROR] {error_msg}")
             
             exec_time = (time.time() - start_time) * 1000
             logger.log(query_request, sql_query, False, error_msg, exec_time)
@@ -111,7 +112,7 @@ def pipeline(query_request):
 
         # 5. Handle empty OR NULL results with intelligent retry
         if is_result_empty_or_null(df):
-            print("[EMPTY/NULL RESULT] Analyzing why query returned no usable results...")
+            if verbose: print("[EMPTY/NULL RESULT] Analyzing why query returned no usable results...")
             
             # Get schema for analysis
             db_structure = db.fetch_schema()
@@ -124,16 +125,17 @@ def pipeline(query_request):
             )
             
             if suggested_sql and suggested_sql != sql_query:
-                print(f"[RETRY] {explanation}")
-                print(f"[RETRY] Trying improved query...")
-                print(f"[RETRY SQL] {suggested_sql[:200]}...")
+                if verbose:
+                    print(f"[RETRY] {explanation}")
+                    print(f"[RETRY] Trying improved query...")
+                    print(f"[RETRY SQL] {suggested_sql[:200]}...")
                 
                 try:
                     df_retry = db.run_query(suggested_sql)
                     
                     # Check if retry gave us better results
                     if df_retry is not None and not is_result_empty_or_null(df_retry):
-                        print(f"[RETRY SUCCESS] Found results with improved query!")
+                        if verbose: print(f"[RETRY SUCCESS] Found results with improved query!")
                         
                         exec_time = (time.time() - start_time) * 1000
                         logger.log(query_request, suggested_sql, True, None, exec_time, 
@@ -147,14 +149,17 @@ def pipeline(query_request):
                         
                         return suggested_sql, df_retry, insights, "sql"
                     else:
-                        print("[RETRY] Still no usable results with improved query")
+                        if verbose: print("[RETRY] Still no usable results with improved query")
                         
                 except Exception as retry_error:
-                    print(f"[RETRY FAILED] {str(retry_error)}")
+                    if verbose: print(f"[RETRY FAILED] {str(retry_error)}")
             
             # If retry didn't work, provide helpful feedback
             exec_time = (time.time() - start_time) * 1000
             logger.log(query_request, sql_query, True, None, exec_time)
+            
+            # LOG FEEDBACK (PENALIZE) - Empty result is likely a strict/bad query
+            llm.feedback_manager.log_feedback(query_request, sql_query, False, "Returned empty/null result")
             
             # Try to get available values to show user
             where_values = analyzer.extract_where_values(sql_query)
@@ -162,7 +167,7 @@ def pipeline(query_request):
             message = "Query executed but returned no results. "
             
             if where_values and db.get_sqlalchemy_engine():
-                for column, value in where_values[:1]:  # Just show first one
+                for column, value in where_values[:20]:  # Show feedback for first 20 columns
                     try:
                         available = analyzer.get_available_values(
                             db.get_sqlalchemy_engine(),
@@ -177,28 +182,36 @@ def pipeline(query_request):
                             if len(available) > 5:
                                 message += f" (and {len(available) - 5} more)"
                     except Exception as e:
-                        print(f"Could not fetch available values: {e}")
+                        if verbose: print(f"Could not fetch available values: {e}")
             
             df = pd.DataFrame([[message]], columns=["Message"])
             return sql_query, df, None, "sql"
 
         # 6. Generate Insights for successful queries
-        print("[PIPELINE] Generating insights...")
+        if verbose: print("[PIPELINE] Generating insights...")
         insights = llm.generate_insights(df, original_query=query_request)
         
         # Log success
         exec_time = (time.time() - start_time) * 1000
         logger.log(query_request, sql_query, True, None, exec_time)
-        print(f"[SUCCESS] Query completed in {exec_time:.0f}ms")
+        
+        # LOG FEEDBACK (GRATIFY)
+        llm.feedback_manager.log_feedback(query_request, sql_query, True)
+        
+        if verbose: print(f"[SUCCESS] Query completed in {exec_time:.0f}ms")
 
         return sql_query, df, insights, "sql"
     
     except Exception as e:
         error_msg = f"Pipeline Error: {str(e)}"
-        print(f"[ERROR] {error_msg}")
+        if verbose: print(f"[ERROR] {error_msg}")
         
         exec_time = (time.time() - start_time) * 1000
         logger.log(query_request, "", False, error_msg, exec_time)
+        
+        # LOG FEEDBACK (PENALIZE) - If we have a generated SQL but execution failed
+        if 'sql_query' in locals() and sql_query:
+            llm.feedback_manager.log_feedback(query_request, sql_query, False, error_msg)
         
         err_df = pd.DataFrame([[error_msg]], columns=["Error"])
         return None, err_df, None, "error"
@@ -208,7 +221,8 @@ def get_stats():
     """Get pipeline statistics"""
     return {
         "query_stats": logger.get_stats(),
-        "cache_stats": llm.get_cache_stats()
+        "cache_stats": llm.get_cache_stats(),
+        "learning_stats": llm.feedback_manager.get_score_stats()
     }
 
 
@@ -231,7 +245,7 @@ def show_recent_failures():
 def main():
     # Test queries including the problematic ones
     test_queries = [
-        "Who updated the candidate profile for demand 51?"
+        "Who are you?"
     ]
     
     for query in test_queries:

@@ -8,13 +8,16 @@ import db  # Import our local db.py file
 from prompt import INSIGHTS_GENERATION_PROMPT
 from sql_prompts import SQL_GENERATION_PROMPT
 import validation
+import feedback
+
 import cache
 import few_shot
 
 load_dotenv()
 
-# Initialize cache (lives for entire session)
-query_cache = cache.QueryCache(ttl_seconds=3600)  # 1 hour TTL
+# Initialize managers
+query_cache = cache.QueryCache(ttl_seconds=3600)
+feedback_manager = feedback.FeedbackManager()
 
 
 def classify_intent(query):
@@ -115,7 +118,6 @@ def clean_sql(sql_text):
     cleaned = re.sub(r"^```sql\s*|\s*```$", "", sql_text.strip(), flags=re.MULTILINE)
     return cleaned.strip()
 
-
 def generate_sql(query_request, user_email=None):
     """
     Generates SQL using Groq with improvements:
@@ -123,6 +125,7 @@ def generate_sql(query_request, user_email=None):
     2. Uses few-shot examples
     3. Validates output
     4. Auto-corrects if needed
+    5. Learns from feedback (Gratify/Penalize)
     """
     
     # STEP 1: Check cache
@@ -141,9 +144,23 @@ def generate_sql(query_request, user_email=None):
     except Exception:
         pass  # It's okay if file doesn't exist yet
 
-    # STEP 3: Get relevant few-shot examples
+    # STEP 3: Get relevant few-shot examples (Static)
     relevant_examples = few_shot.get_relevant_examples(query_request)
     examples_text = few_shot.format_examples(relevant_examples)
+    
+    # STEP 3.5: Get Dynamic Feedback Examples (RLHF)
+    correct_history, incorrect_history = feedback_manager.get_similar_feedback(query_request)
+    
+    feedback_context = ""
+    if correct_history:
+        feedback_context += "\n\nCORRECT EXAMPLES FROM HISTORY (DO THIS):\n"
+        for item in correct_history:
+            feedback_context += f"Q: {item['query']}\nSQL: {item['sql']}\n\n"
+            
+    if incorrect_history:
+        feedback_context += "\n\nAVOID THESE MISTAKES (PREVIOUSLY FAILED):\n"
+        for item in incorrect_history:
+            feedback_context += f"Q: {item['query']}\nBAD SQL: {item['sql']}\nError: {item['error']}\n\n"
     
     # STEP 4: Format schema with valid values
     schema_text = "TABLES AND COLUMNS:\n"
@@ -182,6 +199,8 @@ def generate_sql(query_request, user_email=None):
 
 {examples_text}
 
+{feedback_context}
+
 {user_context}
 
 User Question:
@@ -192,6 +211,9 @@ Generate the SQL now."""
     print("\n[DEBUG] Schema Context Sent to LLM:")
     print("-" * 40)
     print(schema_text) # Print FULL schema
+    if feedback_context:
+        print("\n[DEBUG] Feedback Injected:")
+        print(feedback_context)
     print("-" * 40)
 
     messages = [

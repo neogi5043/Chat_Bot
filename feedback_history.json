@@ -1,0 +1,37 @@
+[
+    {
+        "timestamp": 1769578743.8894482,
+        "query": "Who updated the candidate profile for demand 51?",
+        "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action IN ('CANDIDATE_PROFILE_UPDATED', 'CANDIDATE_UPDATED');",
+        "success": false,
+        "error": "Returned empty/null result"
+    },
+    {
+        "timestamp": 1769578822.2134838,
+        "query": "Who updated the candidate profile for demand 51?",
+        "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action = 'CANDIDATE_PROFILE_UPDATED';",
+        "success": false,
+        "error": "Returned empty/null result"
+    },
+    {
+        "timestamp": 1769578871.682645,
+        "query": "Who updated the candidate profile for demand 51?",
+        "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action IN ('CANDIDATE_PROFILE_UPDATED', 'CANDIDATE_UPDATED');",
+        "success": false,
+        "error": "Returned empty/null result"
+    },
+    {
+        "timestamp": 1769579672.2834468,
+        "query": "no of active demands",
+        "sql": "SELECT COUNT(*) as count \nFROM demands \nWHERE LOWER(status) = LOWER('Open');",
+        "success": true,
+        "error": null
+    },
+    {
+        "timestamp": 1769579703.413565,
+        "query": "no of active demands",
+        "sql": "SELECT COUNT(*) as count \nFROM demands \nWHERE LOWER(status) = LOWER('Open');",
+        "success": true,
+        "error": null
+    }
+]

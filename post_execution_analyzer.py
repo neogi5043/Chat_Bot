@@ -88,11 +88,24 @@ def find_table_for_column(sql, column, schema):
     
     # Search schema for this column
     if schema and "tables" in schema:
+        # First, try to find the table in the SQL query itself
+        # This helps when the same column name exists in multiple tables
+        query_tables_pattern = r'\b(?:FROM|JOIN)\s+([a-zA-Z_]\w+)'
+        tables_in_query = re.findall(query_tables_pattern, sql, re.IGNORECASE)
+        
+        for table_name in tables_in_query:
+            if table_name in schema["tables"] and column_name in schema["tables"][table_name]:
+                return table_name
+
+        # Fallback: search all tables
         for table_name, columns in schema["tables"].items():
             if column_name in columns:
                 return table_name
     
     return None
+
+
+
 
 
 def extract_where_values(sql):
@@ -116,6 +129,23 @@ def extract_where_values(sql):
             column = match.group(1).strip()
             value = match.group(2).strip()
             values.append((column, value))
+            
+    # Pattern 3: column = number
+    pattern3 = r"(\w+\.?\w+)\s*=\s*(\d+)"
+    for match in re.finditer(pattern3, sql, re.IGNORECASE):
+        column = match.group(1).strip()
+        value = match.group(2).strip()
+        values.append((column, value))
+        
+    # Pattern 4: column IN ('val1', 'val2')
+    pattern4 = r"(\w+\.?\w+)\s+IN\s+\(([^)]+)\)"
+    for match in re.finditer(pattern4, sql, re.IGNORECASE):
+        column = match.group(1).strip()
+        in_values_str = match.group(2)
+        # Split by comma and strip quotes
+        in_values = [v.strip().strip("'").strip('"') for v in in_values_str.split(',')]
+        for val in in_values:
+            values.append((column, val))
     
     return values
 
