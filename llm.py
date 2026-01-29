@@ -322,7 +322,8 @@ def generate_insights(result_data, original_query=None):
     elif isinstance(result_data, str):
         data_json = result_data
     else:
-        data_json = json.dumps(result_data, indent=4)
+        # Use default=str to handle datetime objects
+        data_json = json.dumps(result_data, indent=4, default=str)
 
     # 2. Initialize Model
     model = ChatGroq(
