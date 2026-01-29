@@ -2,10 +2,10 @@ import pandas as pd
 import json
 from datetime import datetime
 import time
-import llm  # Import local llm.py
-import db   # Import local db.py
-from prompt import INSIGHTS_GENERATION_PROMPT
-import post_execution_analyzer as analyzer
+from src.common import llm  # Import local llm.py
+from src.common import db   # Import local db.py
+from src.prompts.prompt import INSIGHTS_GENERATION_PROMPT
+from . import post_execution_analyzer as analyzer
 
 # Simple query logger
 class QueryLogger:
@@ -66,7 +66,7 @@ def is_result_empty_or_null(df):
 
 
 
-from agents.orchestrator import TextToSQLOrchestrator
+from src.agents.orchestrator import TextToSQLOrchestrator
 
 # Initialize Global Orchestrator
 orchestrator = TextToSQLOrchestrator()
@@ -104,7 +104,7 @@ def pipeline(query_request, verbose=True):
             
             # Generate insights
             if verbose: print("[PIPELINE] Generating insights...")
-            from llm import generate_insights
+            from src.common.llm import generate_insights
             insight = generate_insights(result_data, query_request)
             
             if verbose:

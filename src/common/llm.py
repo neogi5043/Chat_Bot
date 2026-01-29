@@ -4,14 +4,14 @@ import re
 from langchain_groq.chat_models import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 from dotenv import load_dotenv
-import db  # Import our local db.py file
-from prompt import INSIGHTS_GENERATION_PROMPT
-from sql_prompts import SQL_GENERATION_PROMPT
-import validation
-import feedback
+from . import db  # Import our local db.py file
+from src.prompts.prompt import INSIGHTS_GENERATION_PROMPT
+from src.prompts.sql_prompts import SQL_GENERATION_PROMPT
+from . import validation
+from . import feedback
 
-import cache
-import few_shot
+from . import cache
+from src.prompts import few_shot
 
 load_dotenv()
 

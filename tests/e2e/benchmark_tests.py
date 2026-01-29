@@ -1,7 +1,7 @@
 import json
 import time
-from chatbot import pipeline
-from db import get_connection
+from src.pipeline.chatbot import pipeline
+from src.common.db import get_connection
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -40,7 +40,7 @@ class BenchmarkEvaluator:
                 # Ideally, we should import the `generate_sql` function directly from llm.py 
                 # to test the SQL generation part specifically.
                 
-                from llm import generate_sql
+                from src.common.llm import generate_sql
                 generated_sql = generate_sql(test['user_question'])
                 
                 execution_time = (time.time() - start_time) * 1000

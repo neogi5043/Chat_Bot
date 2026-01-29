@@ -6,8 +6,13 @@ class SemanticLayer:
     """
     Interface to the Semantic Layer definitions.
     """
-    def __init__(self, semantic_layer_path: str = "semantic_layer"):
-        self.base_path = semantic_layer_path
+    def __init__(self, semantic_layer_path: str = None):
+        if semantic_layer_path is None:
+            # Default to ../semantic relative to this file
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            self.base_path = os.path.join(current_dir, "../semantic")
+        else:
+            self.base_path = semantic_layer_path
         self.business_metrics = self._load_json("business_metrics.json").get("business_metrics", {})
         self.data_dictionary = self._load_json("data_dictionary.json").get("data_dictionary", {})
         self.entity_mappings = self._load_json("entity_mappings.json").get("entity_mappings", {})

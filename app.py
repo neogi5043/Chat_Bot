@@ -1,13 +1,13 @@
 import time
 import pandas as pd
-import chatbot
-import llm
+from src.pipeline import chatbot
+from src.common import llm
 
 def print_user(msg):
-    print(f"\n👤 You: {msg}")
+    print(f"\n You: {msg}")
 
 def print_bot(msg):
-    print(f"\n🤖 Bot: {msg}")
+    print(f"\n Bot: {msg}")
 
 def print_system(msg):
     print(f"   [System]: {msg}")
@@ -21,10 +21,10 @@ def main():
 
     while True:
         try:
-            user_input = input("\n👉 Enter your query: ").strip()
+            user_input = input("\n Enter your query: ").strip()
             
             if user_input.lower() in ['exit', 'quit', 'bye']:
-                print_bot("Goodbye! 👋")
+                print_bot("Goodbye! ")
                 break
                 
             if not user_input:
@@ -61,7 +61,7 @@ def main():
                     print("\n" + df.iloc[0,0])
                 else:
                     # Show data neatly
-                    print("\n📊 Data Overview:")
+                    print("\n Data Overview:")
                     print("-" * 40)
                     if len(df) > 10:
                         print(df.head(10).to_string(index=False))
@@ -72,7 +72,7 @@ def main():
 
             # HITL FEEDBACK STEP
             print("\n" + "."*40)
-            feedback = input("   👍 Is this answer helpful? (y/n): ").strip().lower()
+            feedback = input("    Is this answer helpful? (y/n): ").strip().lower()
             
             if feedback == 'y':
                 # Reward

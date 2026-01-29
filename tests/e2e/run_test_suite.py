@@ -2,9 +2,14 @@
 import sys
 import os
 import time
-from chatbot import pipeline
+from src.pipeline.chatbot import pipeline
+import sys
+import os
 
-def run_tests_from_file(filename="test.txt"):
+# Ensure root is in path if running from subdir
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+def run_tests_from_file(filename="tests/fixtures/test.txt"):
     if not os.path.exists(filename):
         print(f"Error: {filename} not found.")
         return

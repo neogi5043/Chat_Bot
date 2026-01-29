@@ -7,7 +7,7 @@ from .validator import ValidatorAgent
 from .execution_engine import ExecutionEngine
 from .correction_agent import CorrectionAgent
 from .feedback_manager import FeedbackManager
-from db import get_connection
+from src.common.db import get_connection
 
 class TextToSQLOrchestrator:
     """
