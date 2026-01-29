@@ -4,7 +4,6 @@ from datetime import datetime
 import time
 from src.common import llm  # Import local llm.py
 from src.common import db   # Import local db.py
-from src.prompts.prompt import INSIGHTS_GENERATION_PROMPT
 from src.common.constants import IntentType
 
 # Simple query logger
@@ -48,21 +47,7 @@ class QueryLogger:
 logger = QueryLogger()
 
 
-def is_result_empty_or_null(df):
-    """
-    Check if result is empty or contains only NULL/None values
-    """
-    if df is None or df.empty:
-        return True
-    
-    # Check if all values are None/NULL
-    # This handles cases where query returns a row but with NULL values
-    if len(df) == 1 and len(df.columns) == 1:
-        value = df.iloc[0, 0]
-        if pd.isna(value) or value is None:
-            return True
-    
-    return False
+
 
 
 
@@ -93,7 +78,6 @@ def pipeline(query_request: str, verbose: bool = True) -> Tuple[Optional[str], O
     # 1. Intent Classification (Legacy check for greeting)
     # We can keep using llm.classify_intent or better, force the orchestrator to handle it.
     # For now, let's fast-track greetings to keep it cheap.
-    intent = llm.classify_intent(query_request)
     intent = llm.classify_intent(query_request)
     if intent == IntentType.GENERAL_CONVERSATION:
          response = llm.handle_general_conversation(query_request)

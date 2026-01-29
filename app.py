@@ -5,12 +5,22 @@ from src.pipeline import chatbot
 from src.common import llm
 from src.common.constants import IntentType
 
+import os
+from logging.handlers import RotatingFileHandler
+
 # Configure Logging
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('chatbot.log'),
+        RotatingFileHandler(
+            os.path.join(log_dir, 'chatbot.log'),
+            maxBytes=10_000_000,  # 10MB
+            backupCount=5
+        ),
         logging.StreamHandler()
     ]
 )
