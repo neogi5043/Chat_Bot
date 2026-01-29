@@ -51,5 +51,14 @@
     "error": "relation \"projects\" does not exist\nLINE 10:   (SELECT total_budget FROM \"projects\" WHERE project_name = ...\n                                     ^\n",
     "user_correction": null,
     "timestamp": "TODO_TIMESTAMP"
+  },
+  {
+    "id": "e2be15f0-123c-40ec-b792-34a95f3739c2",
+    "query": "what is the number of demands in digital eng  practice",
+    "sql": "SELECT COUNT(*) \nFROM demands \nWHERE practice = 'Digital Eng Practice';",
+    "success": false,
+    "error": "column \"practice\" does not exist\nLINE 3: WHERE practice = 'Digital Eng Practice';\n              ^\nHINT:  Perhaps you meant to reference the column \"demands.practice_id\".\n",
+    "user_correction": null,
+    "timestamp": "TODO_TIMESTAMP"
   }
 ]

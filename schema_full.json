@@ -1,0 +1,191 @@
+{
+  "tables": {
+    "accounts": {
+      "account_id": "bigint",
+      "account_name": "character varying",
+      "created_at": "timestamp without time zone",
+      "updated_at": "timestamp without time zone"
+    },
+    "candidates": {
+      "candidate_id": "bigint",
+      "demand_id": "bigint",
+      "first_name": "character varying",
+      "last_name": "character varying",
+      "interview_status": "character varying",
+      "skills": "text",
+      "total_experience": "character varying",
+      "current_company": "character varying",
+      "current_position": "character varying",
+      "resume_url": "text",
+      "created_at": "timestamp without time zone",
+      "updated_at": "timestamp without time zone",
+      "cv_id": "character varying",
+      "jd_fitment_score": "double precision",
+      "fitment_reason": "character varying"
+    },
+    "demand_activity": {
+      "id": "bigint",
+      "demand_id": "bigint",
+      "actor_id": "bigint",
+      "actor_role": "character varying",
+      "actor_name": "character varying",
+      "action": "character varying",
+      "old_value": "character varying",
+      "new_value": "character varying",
+      "description": "text",
+      "created_at": "timestamp without time zone",
+      "candidate_id": "bigint"
+    },
+    "demand_activity_read": {
+      "id": "bigint",
+      "activity_id": "bigint",
+      "user_id": "bigint",
+      "read_at": "timestamp without time zone"
+    },
+    "demand_cancellations": {
+      "id": "bigint",
+      "cancelled_at": "timestamp without time zone",
+      "cancelled_by": "integer",
+      "demand_id": "bigint",
+      "reason": "text"
+    },
+    "demand_cvs": {
+      "id": "bigint",
+      "content_type": "character varying",
+      "demand_id": "bigint",
+      "file_name": "character varying",
+      "file_size": "bigint",
+      "s3key": "character varying",
+      "uploaded_at": "timestamp without time zone"
+    },
+    "demands": {
+      "demand_id": "bigint",
+      "practice_id": "bigint",
+      "account_id": "bigint",
+      "demand_owner_id": "bigint",
+      "hiring_manager_id": "bigint",
+      "status": "character varying",
+      "geo_location": "character varying",
+      "position_title": "character varying",
+      "position_count": "integer",
+      "billability": "character varying",
+      "probability": "character varying",
+      "expected_start_date": "date",
+      "type_of_hire": "character varying",
+      "mode_of_hire": "character varying",
+      "experience": "character varying",
+      "priority": "character varying",
+      "source": "character varying",
+      "job_description": "text",
+      "customer_interview": "character varying",
+      "created_at": "timestamp without time zone",
+      "updated_at": "timestamp without time zone",
+      "assigned_to": "character varying",
+      "assigned_at": "timestamp without time zone",
+      "fulfilled_at": "timestamp without time zone"
+    },
+    "managers": {
+      "manager_id": "bigint",
+      "manager_name": "character varying",
+      "email": "character varying",
+      "practice_id": "bigint",
+      "created_at": "timestamp without time zone",
+      "updated_at": "timestamp without time zone"
+    },
+    "practices": {
+      "practice_id": "bigint",
+      "practice_name": "character varying",
+      "description": "text",
+      "created_at": "timestamp without time zone",
+      "updated_at": "timestamp without time zone"
+    },
+    "users": {
+      "id": "integer",
+      "name": "character varying",
+      "email": "character varying",
+      "password": "character varying",
+      "role": "character varying",
+      "is_active": "boolean"
+    }
+  },
+  "relationships": [
+    {
+      "from_table": "candidates",
+      "from_column": "demand_id",
+      "to_table": "demands",
+      "to_column": "demand_id"
+    },
+    {
+      "from_table": "demand_activity_read",
+      "from_column": "activity_id",
+      "to_table": "demand_activity",
+      "to_column": "id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "account_id",
+      "to_table": "accounts",
+      "to_column": "account_id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "demand_owner_id",
+      "to_table": "users",
+      "to_column": "id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "hiring_manager_id",
+      "to_table": "managers",
+      "to_column": "manager_id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "demands",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "managers",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "managers",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "managers",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    },
+    {
+      "from_table": "managers",
+      "from_column": "practice_id",
+      "to_table": "practices",
+      "to_column": "practice_id"
+    }
+  ]
+}

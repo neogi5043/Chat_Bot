@@ -1,18 +1,53 @@
 {
     "entity_mappings": {
+        "practice_names": {
+            "type": "categorical_values",
+            "source_table": "practices",
+            "source_column": "practice_name",
+            "values": [
+                {
+                    "canonical_value": "Digital Engineering",
+                    "aliases": [
+                        "digital eng",
+                        "digital engineering practice",
+                        "de",
+                        "digital"
+                    ]
+                },
+                {
+                    "canonical_value": "Cloud & DevOps",
+                    "aliases": [
+                        "cloud",
+                        "devops",
+                        "cloud practice"
+                    ]
+                },
+                {
+                    "canonical_value": "Data & Analytics",
+                    "aliases": [
+                        "data",
+                        "analytics",
+                        "data science",
+                        "ai",
+                        "ml"
+                    ]
+                }
+            ]
+        },
         "project_names": {
             "type": "categorical_values",
             "source_table": "projects",
             "source_column": "project_name",
-            "vector_embeddings": true,
-            "values": []
-        },
-        "skills": {
-            "type": "categorical_values",
-            "source_table": "candidate_details",
-            "source_column": "skills",
-            "vector_embeddings": true,
-            "values": []
+            "values": [
+                {
+                    "canonical_value": "Phoenix Implementation",
+                    "aliases": [
+                        "phoenix",
+                        "project phoenix",
+                        "phoenix re-work"
+                    ]
+                }
+            ]
         }
     }
 }

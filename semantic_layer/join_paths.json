@@ -1,11 +1,22 @@
 {
     "join_paths": {
-        "projects_to_department": {
-            "path": "projects.department_id -> departments.id",
-            "description": "Link projects to their owning department",
-            "join_conditions": [
-                "projects.department_id = departments.id"
-            ]
+        "demands_practices": {
+            "table_a": "demands",
+            "table_b": "practices",
+            "join_condition": "demands.practice_id = practices.practice_id",
+            "join_type": "JOIN"
+        },
+        "demands_accounts": {
+            "table_a": "demands",
+            "table_b": "accounts",
+            "join_condition": "demands.account_id = accounts.account_id",
+            "join_type": "JOIN"
+        },
+        "demands_candidates": {
+            "table_a": "demands",
+            "table_b": "candidates",
+            "join_condition": "demands.demand_id = candidates.demand_id",
+            "join_type": "LEFT JOIN"
         }
     }
 }

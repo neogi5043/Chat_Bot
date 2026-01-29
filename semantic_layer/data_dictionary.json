@@ -1,9 +1,101 @@
 {
     "data_dictionary": {
+        "demands": {
+            "table_id": "demands",
+            "business_name": "Demands / Open Positions",
+            "description": "Contains all open job requisitions (demands) and their status.",
+            "columns": {
+                "demand_id": {
+                    "type": "bigint",
+                    "business_term": "Demand ID"
+                },
+                "status": {
+                    "type": "varchar",
+                    "business_term": "Demand Status"
+                },
+                "position_title": {
+                    "type": "varchar",
+                    "business_term": "Role Title"
+                },
+                "experience": {
+                    "type": "varchar",
+                    "business_term": "Experience Level"
+                },
+                "job_description": {
+                    "type": "text",
+                    "business_term": "JD"
+                },
+                "practice_id": {
+                    "type": "bigint",
+                    "business_term": "Practice ID"
+                },
+                "account_id": {
+                    "type": "bigint",
+                    "business_term": "Account ID"
+                }
+            }
+        },
+        "practices": {
+            "table_id": "practices",
+            "business_name": "Practices",
+            "description": "Business Units or Practice areas (e.g. Digital, Cloud).",
+            "columns": {
+                "practice_id": {
+                    "type": "bigint",
+                    "business_term": "Practice ID"
+                },
+                "practice_name": {
+                    "type": "varchar",
+                    "business_term": "Practice Name"
+                }
+            }
+        },
+        "accounts": {
+            "table_id": "accounts",
+            "business_name": "Accounts",
+            "description": "Customer accounts or clients.",
+            "columns": {
+                "account_id": {
+                    "type": "bigint",
+                    "business_term": "Account ID"
+                },
+                "account_name": {
+                    "type": "varchar",
+                    "business_term": "Client Name"
+                }
+            }
+        },
+        "candidates": {
+            "table_id": "candidates",
+            "business_name": "Candidates",
+            "description": "Applicants applied to demands.",
+            "columns": {
+                "candidate_id": {
+                    "type": "bigint",
+                    "business_term": "Candidate ID"
+                },
+                "first_name": {
+                    "type": "varchar",
+                    "business_term": "First Name"
+                },
+                "last_name": {
+                    "type": "varchar",
+                    "business_term": "Last Name"
+                },
+                "skills": {
+                    "type": "text",
+                    "business_term": "Candidate Skills"
+                },
+                "interview_status": {
+                    "type": "varchar",
+                    "business_term": "Interview Status"
+                }
+            }
+        },
         "projects": {
             "table_id": "projects",
             "business_name": "Projects",
-            "description": "All company projects",
+            "description": "Internal or external projects.",
             "columns": {
                 "amount": {
                     "type": "DECIMAL",
