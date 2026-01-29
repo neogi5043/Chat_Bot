@@ -4,13 +4,13 @@ A production-grade Text-to-SQL system powered by a **Multi-Agent Architecture**.
 
 ---
 
-## 🏗️ Architecture Overview
+##  Architecture Overview
 
 The system has moved away from a monolithic LLM call to a modular **Agent Swarm**. Each agent is responsible for a specific stage of the pipeline, orchestrated by the `TextToSQLOrchestrator`.
 
 ### High-Level Data Flow
 
-![Architecture Diagram](architecture_diagram.png)
+
 
 ```mermaid
 graph TD
@@ -49,7 +49,7 @@ graph TD
 
 ---
 
-## 🧠 Core Components
+##  Core Components
 
 ### 1. The Semantic Layer (`agents/semantic_layer.py`)
 The "Brain" of the system. It abstracts the raw database schema into business concepts.
@@ -78,7 +78,7 @@ The system gets smarter over time.
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Python 3.9+
@@ -114,7 +114,7 @@ python verify_orchestrator.py
 
 ---
 
-## 📂 Directory Structure
+##  Directory Structure
 
 ```
 C:\PROJECT\INTERNAL\GENAI_CHATBOT
