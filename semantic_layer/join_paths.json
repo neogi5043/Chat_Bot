@@ -17,6 +17,30 @@
             "table_b": "candidates",
             "join_condition": "demands.demand_id = candidates.demand_id",
             "join_type": "LEFT JOIN"
+        },
+        "managers_practices": {
+            "table_a": "managers",
+            "table_b": "practices",
+            "join_condition": "managers.practice_id = practices.practice_id",
+            "join_type": "JOIN"
+        },
+        "demand_activity_demands": {
+            "table_a": "demand_activity",
+            "table_b": "demands",
+            "join_condition": "demand_activity.demand_id = demands.demand_id",
+            "join_type": "JOIN"
+        },
+        "demand_cancellations_demands": {
+            "table_a": "demand_cancellations",
+            "table_b": "demands",
+            "join_condition": "demand_cancellations.demand_id = demands.demand_id",
+            "join_type": "JOIN"
+        },
+        "demand_cvs_demands": {
+            "table_a": "demand_cvs",
+            "table_b": "demands",
+            "join_condition": "demand_cvs.demand_id = demands.demand_id",
+            "join_type": "JOIN"
         }
     }
 }

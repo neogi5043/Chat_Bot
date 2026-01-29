@@ -1,0 +1,8 @@
+What is the email of the manager 'Komal Gupta'?
+Find the email of the user 'Sayan'.
+Who are the managers with the name 'Ankit Singh'?
+Show the description for the 'Cloud & DevOps' practice.
+Show the latest demand activities.
+List all candidates with 5 years of experience.
+Show the history of changes for Demand ID 88.
+Who updated the candidate profile for demand 66?

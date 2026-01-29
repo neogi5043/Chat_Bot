@@ -75,6 +75,10 @@
                 "practice_name": {
                     "type": "varchar",
                     "business_term": "Practice Name"
+                },
+                "description": {
+                    "type": "text",
+                    "business_term": "Practice Description"
                 }
             }
         },
@@ -114,9 +118,124 @@
                     "type": "text",
                     "business_term": "Candidate Skills"
                 },
+                "total_experience": {
+                    "type": "varchar",
+                    "business_term": "Total Experience"
+                },
                 "interview_status": {
                     "type": "varchar",
                     "business_term": "Interview Status"
+                }
+            }
+        },
+        "managers": {
+            "table_id": "managers",
+            "business_name": "Managers",
+            "description": "Hiring Managers and Practice Leads.",
+            "columns": {
+                "manager_id": {
+                    "type": "bigint",
+                    "business_term": "Manager ID"
+                },
+                "manager_name": {
+                    "type": "varchar",
+                    "business_term": "Manager Name"
+                },
+                "email": {
+                    "type": "varchar",
+                    "business_term": "Manager Email"
+                },
+                "practice_id": {
+                    "type": "bigint",
+                    "business_term": "Practice ID"
+                }
+            }
+        },
+        "users": {
+            "table_id": "users",
+            "business_name": "Users",
+            "description": "System users handling demands and candidates.",
+            "columns": {
+                "id": {
+                    "type": "integer",
+                    "business_term": "User ID"
+                },
+                "name": {
+                    "type": "varchar",
+                    "business_term": "User Name"
+                },
+                "email": {
+                    "type": "varchar",
+                    "business_term": "User Email"
+                },
+                "role": {
+                    "type": "varchar",
+                    "business_term": "User Role"
+                }
+            }
+        },
+        "demand_activity": {
+            "table_id": "demand_activity",
+            "business_name": "Demand Activity History",
+            "description": "Audit log of all changes made to demands and candidates (e.g. status changes, updates).",
+            "columns": {
+                "demand_id": {
+                    "type": "bigint",
+                    "business_term": "Demand ID"
+                },
+                "actor_name": {
+                    "type": "varchar",
+                    "business_term": "Updated By Name"
+                },
+                "action": {
+                    "type": "varchar",
+                    "business_term": "Action Taken"
+                },
+                "description": {
+                    "type": "text",
+                    "business_term": "Change Details"
+                },
+                "created_at": {
+                    "type": "timestamp",
+                    "business_term": "Activity Time"
+                }
+            }
+        },
+        "demand_cancellations": {
+            "table_id": "demand_cancellations",
+            "business_name": "Cancelled Demands",
+            "description": "Records of cancelled demands and reasons.",
+            "columns": {
+                "demand_id": {
+                    "type": "bigint",
+                    "business_term": "Demand ID"
+                },
+                "reason": {
+                    "type": "text",
+                    "business_term": "Cancellation Reason"
+                },
+                "cancelled_at": {
+                    "type": "timestamp",
+                    "business_term": "Cancellation Date"
+                }
+            }
+        },
+        "demand_cvs": {
+            "table_id": "demand_cvs",
+            "business_name": "Resumes / CVs",
+            "description": "Metadata for uploaded candidate resumes.",
+            "columns": {
+                "demand_id": {
+                    "type": "bigint",
+                    "business_term": "Demand ID"
+                },
+                "file_name": {
+                    "type": "varchar",
+                    "business_term": "File Name"
+                },
+                "s3key": {
+                    "type": "varchar",
+                    "business_term": "Download URL Key"
                 }
             }
         },

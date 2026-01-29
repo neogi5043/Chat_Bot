@@ -10,6 +10,13 @@ class SchemaSelectorAgent:
         self.semantic_layer = semantic_layer
         self.vector_db = vector_db # Placeholder for Phase 2
         self.top_k = 5
+        self.common_terms = {
+            "demand_activity": ["history", "updated", "change", "audit", "log", "activity", "action", "detail", "activities"],
+            "demand_cancellations": ["cancel", "reason", "revoked", "dropped", "cancelled", "canceling"],
+            "demand_cvs": ["resume", "cv", "file", "download", "attachment", "document"],
+            "managers": ["manager", "lead", "owner"],
+            "users": ["user", "login", "admin", "role"]
+        }
     
     def select_schema(self, user_query: str) -> List[dict]:
         """
@@ -17,6 +24,13 @@ class SchemaSelectorAgent:
         2. Expand with join paths.
         """
         candidates = set()
+        
+        # Check Common Terms
+        if hasattr(self, 'common_terms'):
+            for table, terms in self.common_terms.items():
+                for term in terms:
+                    if term in user_query.lower():
+                        candidates.add(table)
         
         # Simple Keyword Match Simulation
         query_lower = user_query.lower()

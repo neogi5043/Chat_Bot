@@ -135,5 +135,41 @@
     "error": "relation \"demand_history\" does not exist\nLINE 2: FROM demand_history \n             ^\n",
     "user_correction": null,
     "timestamp": "TODO_TIMESTAMP"
+  },
+  {
+    "id": "0c0acc28-122b-4dc0-9d7a-136d9592e635",
+    "query": "Find the email of the user 'Sayan'.",
+    "sql": "SELECT email FROM candidates WHERE first_name = 'Sayan';",
+    "success": false,
+    "error": "column \"email\" does not exist\nLINE 1: SELECT email FROM candidates WHERE first_name = 'Sayan';\n               ^\n",
+    "user_correction": null,
+    "timestamp": "TODO_TIMESTAMP"
+  },
+  {
+    "id": "05211cb8-ff43-4b5e-8821-06a0a14d1d71",
+    "query": "Show the description for the 'Cloud & DevOps' practice.",
+    "sql": "SELECT T2.description \nFROM demands AS T1 \nINNER JOIN practices AS T2 \nON T1.practice_id = T2.id \nWHERE T2.name = 'Cloud & DevOps';",
+    "success": false,
+    "error": "column t2.id does not exist\nLINE 4: ON T1.practice_id = T2.id \n                            ^\n",
+    "user_correction": null,
+    "timestamp": "TODO_TIMESTAMP"
+  },
+  {
+    "id": "5b2ff660-3daa-4cb1-9516-234ad4d9a978",
+    "query": "List all candidates with 5 years of experience.",
+    "sql": "SELECT candidate_id, first_name, last_name, skills, interview_status \nFROM candidates \nWHERE years_of_experience = 5;",
+    "success": false,
+    "error": "column \"years_of_experience\" does not exist\nLINE 3: WHERE years_of_experience = 5;\n              ^\n",
+    "user_correction": null,
+    "timestamp": "TODO_TIMESTAMP"
+  },
+  {
+    "id": "5cf91e94-7292-4136-b748-ccd2c63876f6",
+    "query": "Show the latest demand activities.",
+    "sql": "SELECT * \nFROM demand_activities \nORDER BY activity_date DESC \nLIMIT 1;",
+    "success": false,
+    "error": "relation \"demand_activities\" does not exist\nLINE 2: FROM demand_activities \n             ^\n",
+    "user_correction": null,
+    "timestamp": "TODO_TIMESTAMP"
   }
 ]
