@@ -8,6 +8,8 @@ class ExecutionResult:
         self.error = error
         self.execution_time_ms = execution_time_ms
 
+from src.common.db import release_connection
+
 class ExecutionEngine:
     """
     Safely executes SQL and handles errors.
@@ -43,4 +45,4 @@ class ExecutionEngine:
             return ExecutionResult(success=False, error=str(e), execution_time_ms=duration)
         finally:
             if conn:
-                conn.close()
+                release_connection(conn)

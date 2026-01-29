@@ -7,6 +7,8 @@ class ValidationResult:
         self.errors = errors
         self.warnings = warnings
         
+from src.common.db import release_connection
+
 class ValidatorAgent:
     """
     Validates generated SQL before execution.
@@ -67,4 +69,4 @@ class ValidatorAgent:
             return False, [f"Syntax Error: {msg}"]
         finally:
             if conn:
-                conn.close()
+                release_connection(conn)

@@ -8,20 +8,55 @@ from sqlalchemy import create_engine
 # Load environment variables
 load_dotenv()
 
-def get_connection():
-    """Establishes connection to PostgreSQL"""
-    return psycopg2.connect(
+from psycopg2 import pool
+import atexit
+
+# Initialize Connection Pool
+try:
+    _pg_pool = pool.ThreadedConnectionPool(
+        minconn=1,
+        maxconn=10,
         host=os.getenv("DB_HOST"),
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
         port=os.getenv("DB_PORT")
     )
+except Exception as e:
+    print(f"DB Pool Creation Failed: {e}")
+    _pg_pool = None
+
+def get_connection():
+    """Establishes connection to PostgreSQL using a pool"""
+    if _pg_pool:
+         return _pg_pool.getconn()
+    else:
+        # Fallback if pool failed
+        return psycopg2.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
+            port=os.getenv("DB_PORT")
+        )
+
+def release_connection(conn):
+    """Release connection back to pool"""
+    if _pg_pool and conn:
+        _pg_pool.putconn(conn)
+    elif conn:
+        conn.close()
+
+@atexit.register
+def close_pool():
+    if _pg_pool:
+        _pg_pool.closeall()
 
 def get_sqlalchemy_engine():
     """Creates SQLAlchemy engine for pandas"""
+    # SQLAlchemy has its own pooling built-in by default
     db_url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    return create_engine(db_url)
+    return create_engine(db_url, pool_size=10, max_overflow=20)
 
 def fetch_schema():
     """Fetches table and column names with data types and foreign key relationships"""

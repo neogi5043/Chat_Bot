@@ -69,12 +69,20 @@ def is_result_empty_or_null(df):
 from src.agents.orchestrator import TextToSQLOrchestrator
 
 # Initialize Global Orchestrator
-orchestrator = TextToSQLOrchestrator()
+# Initialize Global Orchestrator (Lazy Load)
+_orchestrator = None
+
+def get_orchestrator():
+    global _orchestrator
+    if _orchestrator is None:
+        _orchestrator = TextToSQLOrchestrator()
+    return _orchestrator
 
 def pipeline(query_request, verbose=True):
     """
     New Entry Point: Delegates to TextToSQLOrchestrator.
     """
+    orchestrator = get_orchestrator()
     start_time = time.time()
     
     if verbose:
@@ -132,22 +140,39 @@ def get_stats():
     """
     Returns system statistics.
     """
+    orchestrator = get_orchestrator()
     return {
-        "cache_hits": 0,
-        "feedback_count": len(orchestrator.feedback_manager.history),
-        "few_shot_count": len(orchestrator.feedback_manager.few_shots)
+        "query_stats": logger.get_stats(),
+        "cache_stats": {
+            "cache_hits": 0,
+            "feedback_count": len(orchestrator.feedback_manager.history),
+            "few_shot_count": len(orchestrator.feedback_manager.few_shots)
+        }
     }
 
 def show_recent_failures():
     """Show recent failures (from FeedbackManager)"""
-    failures = orchestrator.feedback_manager.get_similar_feedback("", top_k=5)[1] # get incorrect
+    orchestrator = get_orchestrator()
+    if not hasattr(orchestrator, 'feedback_manager'):
+        return
+
+    try:
+        result = orchestrator.feedback_manager.get_similar_feedback("", top_k=5)
+        # get_similar_feedback returns (correct, incorrect)
+        if result and isinstance(result, tuple) and len(result) >= 2:
+            failures = result[1]
+        else:
+            failures = []
+    except Exception:
+        failures = []
+
     if not failures:
         print("No recent failures logged.")
         return
 
     print("\nRECENT FAILURES (from Feedback History):")
     for f in failures:
-        print(f"- {f.get('query')}: {f.get('error')}")
+        print(f"- {f.get('query', 'N/A')}: {f.get('error', 'N/A')}")
 
 
 

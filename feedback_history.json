@@ -5,5 +5,12 @@
         "sql": "SELECT COUNT(demand_id) FROM demands WHERE status = 'Open';",
         "success": true,
         "error": null
+    },
+    {
+        "timestamp": 1769707991.3538623,
+        "query": "no of  open demands?",
+        "sql": "SELECT COUNT(demand_id) FROM demands WHERE status = 'Open';",
+        "success": true,
+        "error": null
     }
 ]
