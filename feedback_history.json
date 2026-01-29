@@ -1,175 +1,189 @@
 [
-  {
-    "timestamp": 1769578743.8894482,
-    "query": "Who updated the candidate profile for demand 51?",
-    "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action IN ('CANDIDATE_PROFILE_UPDATED', 'CANDIDATE_UPDATED');",
-    "success": false,
-    "error": "Returned empty/null result"
-  },
-  {
-    "timestamp": 1769578822.2134838,
-    "query": "Who updated the candidate profile for demand 51?",
-    "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action = 'CANDIDATE_PROFILE_UPDATED';",
-    "success": false,
-    "error": "Returned empty/null result"
-  },
-  {
-    "timestamp": 1769578871.682645,
-    "query": "Who updated the candidate profile for demand 51?",
-    "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action IN ('CANDIDATE_PROFILE_UPDATED', 'CANDIDATE_UPDATED');",
-    "success": false,
-    "error": "Returned empty/null result"
-  },
-  {
-    "timestamp": 1769579672.2834468,
-    "query": "no of active demands",
-    "sql": "SELECT COUNT(*) as count \nFROM demands \nWHERE LOWER(status) = LOWER('Open');",
-    "success": true,
-    "error": null
-  },
-  {
-    "timestamp": 1769579703.413565,
-    "query": "no of active demands",
-    "sql": "SELECT COUNT(*) as count \nFROM demands \nWHERE LOWER(status) = LOWER('Open');",
-    "success": true,
-    "error": null
-  },
-  {
-    "id": "22df1269-2290-4bab-8a9c-c077d757f75e",
-    "query": "Show me the project budget for Phoenix Implementation",
-    "sql": "SELECT amount FROM projects WHERE project_name = 'Phoenix Implementation';",
-    "success": false,
-    "error": "relation \"projects\" does not exist\nLINE 1: SELECT amount FROM projects WHERE project_name = 'Phoenix Im...\n                           ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "a8426256-77c4-4725-9220-4f71c210768c",
-    "query": "Compare budget of Project Phoenix and Digital Transformation",
-    "sql": "SELECT \n  phoenix.total_budget AS phoenix_budget,\n  digital_transformation.total_budget AS digital_transformation_budget,\n  CASE \n    WHEN phoenix.total_budget > digital_transformation.total_budget THEN 'Project Phoenix has higher budget'\n    WHEN phoenix.total_budget < digital_transformation.total_budget THEN 'Digital Transformation has higher budget'\n    ELSE 'Both projects have the same budget'\n  END AS comparison_result\nFROM \n  (SELECT total_budget FROM \"projects\" WHERE project_name = 'Project Phoenix') AS phoenix,\n  (SELECT total_budget FROM \"projects\" WHERE project_name = 'Digital Transformation') AS digital_transformation;",
-    "success": false,
-    "error": "relation \"projects\" does not exist\nLINE 10:   (SELECT total_budget FROM \"projects\" WHERE project_name = ...\n                                     ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "e2be15f0-123c-40ec-b792-34a95f3739c2",
-    "query": "what is the number of demands in digital eng  practice",
-    "sql": "SELECT COUNT(*) \nFROM demands \nWHERE practice = 'Digital Eng Practice';",
-    "success": false,
-    "error": "column \"practice\" does not exist\nLINE 3: WHERE practice = 'Digital Eng Practice';\n              ^\nHINT:  Perhaps you meant to reference the column \"demands.practice_id\".\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "a6bdf365-8268-44f6-a012-d8e84cdd069e",
-    "query": "Find the resume URL for candidate 'Siddharth Dey'.",
-    "sql": "To fix the query, we need to identify the correct column name for the candidate's name. Let's assume the correct column name is `candidate_name`. \n\nSELECT resume_url FROM candidates WHERE candidate_name = 'Siddharth Dey';",
-    "success": false,
-    "error": "syntax error at or near \"To\"\nLINE 1: To fix the query, we need to identify the correct column nam...\n        ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "timestamp": 1769694452.3351505,
-    "query": "Show me all demands for the account 'Verizon Communications",
-    "sql": "SELECT d.* \nFROM demands d\nJOIN accounts a ON d.account_id = a.account_id\nWHERE a.account_name = 'Verizon Communications';",
-    "success": true,
-    "error": null
-  },
-  {
-    "timestamp": 1769694483.868858,
-    "query": "Find the email of the user 'Sayan",
-    "sql": "SELECT email FROM users WHERE name = 'Sayan';",
-    "success": true,
-    "error": null
-  },
-  {
-    "id": "fb32e217-dc0f-45b0-924b-57abc1eb6cf0",
-    "query": "List all 'Permanent' type hires",
-    "sql": "SELECT * \nFROM candidates \nWHERE type = 'Permanent';",
-    "success": false,
-    "error": "column \"type\" does not exist\nLINE 3: WHERE type = 'Permanent';\n              ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "timestamp": 1769695173.81318,
-    "query": "List all 'Permanent' type hires",
-    "sql": "SELECT * FROM Candidates \nWHERE candidate_id IN (\n  SELECT candidate_id FROM Demands \n  WHERE type_of_hire = 'Permanent'\n)",
-    "success": true,
-    "error": null
-  },
-  {
-    "id": "4306ed22-46c8-40cf-92fe-f804a004309e",
-    "query": "Show the description for the 'Cloud & DevOps' practice.",
-    "sql": "SELECT T2.description \nFROM demands AS T1 \nINNER JOIN practices AS T2 \nON T1.practice_id = T2.id \nWHERE T2.name = 'Cloud & DevOps';",
-    "success": false,
-    "error": "column t2.id does not exist\nLINE 4: ON T1.practice_id = T2.id \n                            ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "5d81af24-3546-44ec-b55d-84c8738f95b8",
-    "query": "Find the email of the user 'Sayan'.",
-    "sql": "SELECT email \nFROM candidates \nWHERE first_name = 'Sayan';",
-    "success": false,
-    "error": "column \"email\" does not exist\nLINE 1: SELECT email \n               ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "083cc0fc-8bff-4b45-8100-71a74736598e",
-    "query": "List all candidates with 5 years of experience.",
-    "sql": "SELECT * \nFROM candidates \nWHERE skills LIKE '%5 years%' OR skills LIKE '%5 year%' OR experience = '5';",
-    "success": false,
-    "error": "column \"experience\" does not exist\nLINE 3: ...lls LIKE '%5 years%' OR skills LIKE '%5 year%' OR experience...\n                                                             ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "ca33b3da-4697-4294-bd2e-1ca2bb864805",
-    "query": "Show the history of changes for Demand ID 88.",
-    "sql": "SELECT * \nFROM demand_history \nWHERE demand_id = 88 \nORDER BY change_date;",
-    "success": false,
-    "error": "relation \"demand_history\" does not exist\nLINE 2: FROM demand_history \n             ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "0c0acc28-122b-4dc0-9d7a-136d9592e635",
-    "query": "Find the email of the user 'Sayan'.",
-    "sql": "SELECT email FROM candidates WHERE first_name = 'Sayan';",
-    "success": false,
-    "error": "column \"email\" does not exist\nLINE 1: SELECT email FROM candidates WHERE first_name = 'Sayan';\n               ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "05211cb8-ff43-4b5e-8821-06a0a14d1d71",
-    "query": "Show the description for the 'Cloud & DevOps' practice.",
-    "sql": "SELECT T2.description \nFROM demands AS T1 \nINNER JOIN practices AS T2 \nON T1.practice_id = T2.id \nWHERE T2.name = 'Cloud & DevOps';",
-    "success": false,
-    "error": "column t2.id does not exist\nLINE 4: ON T1.practice_id = T2.id \n                            ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "5b2ff660-3daa-4cb1-9516-234ad4d9a978",
-    "query": "List all candidates with 5 years of experience.",
-    "sql": "SELECT candidate_id, first_name, last_name, skills, interview_status \nFROM candidates \nWHERE years_of_experience = 5;",
-    "success": false,
-    "error": "column \"years_of_experience\" does not exist\nLINE 3: WHERE years_of_experience = 5;\n              ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  },
-  {
-    "id": "5cf91e94-7292-4136-b748-ccd2c63876f6",
-    "query": "Show the latest demand activities.",
-    "sql": "SELECT * \nFROM demand_activities \nORDER BY activity_date DESC \nLIMIT 1;",
-    "success": false,
-    "error": "relation \"demand_activities\" does not exist\nLINE 2: FROM demand_activities \n             ^\n",
-    "user_correction": null,
-    "timestamp": "TODO_TIMESTAMP"
-  }
+    {
+        "timestamp": 1769578743.8894482,
+        "query": "Who updated the candidate profile for demand 51?",
+        "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action IN ('CANDIDATE_PROFILE_UPDATED', 'CANDIDATE_UPDATED');",
+        "success": false,
+        "error": "Returned empty/null result"
+    },
+    {
+        "timestamp": 1769578822.2134838,
+        "query": "Who updated the candidate profile for demand 51?",
+        "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action = 'CANDIDATE_PROFILE_UPDATED';",
+        "success": false,
+        "error": "Returned empty/null result"
+    },
+    {
+        "timestamp": 1769578871.682645,
+        "query": "Who updated the candidate profile for demand 51?",
+        "sql": "SELECT actor_name \nFROM demand_activity \nWHERE demand_id = 51 AND action IN ('CANDIDATE_PROFILE_UPDATED', 'CANDIDATE_UPDATED');",
+        "success": false,
+        "error": "Returned empty/null result"
+    },
+    {
+        "timestamp": 1769579672.2834468,
+        "query": "no of active demands",
+        "sql": "SELECT COUNT(*) as count \nFROM demands \nWHERE LOWER(status) = LOWER('Open');",
+        "success": true,
+        "error": null
+    },
+    {
+        "timestamp": 1769579703.413565,
+        "query": "no of active demands",
+        "sql": "SELECT COUNT(*) as count \nFROM demands \nWHERE LOWER(status) = LOWER('Open');",
+        "success": true,
+        "error": null
+    },
+    {
+        "id": "22df1269-2290-4bab-8a9c-c077d757f75e",
+        "query": "Show me the project budget for Phoenix Implementation",
+        "sql": "SELECT amount FROM projects WHERE project_name = 'Phoenix Implementation';",
+        "success": false,
+        "error": "relation \"projects\" does not exist\nLINE 1: SELECT amount FROM projects WHERE project_name = 'Phoenix Im...\n                           ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "a8426256-77c4-4725-9220-4f71c210768c",
+        "query": "Compare budget of Project Phoenix and Digital Transformation",
+        "sql": "SELECT \n  phoenix.total_budget AS phoenix_budget,\n  digital_transformation.total_budget AS digital_transformation_budget,\n  CASE \n    WHEN phoenix.total_budget > digital_transformation.total_budget THEN 'Project Phoenix has higher budget'\n    WHEN phoenix.total_budget < digital_transformation.total_budget THEN 'Digital Transformation has higher budget'\n    ELSE 'Both projects have the same budget'\n  END AS comparison_result\nFROM \n  (SELECT total_budget FROM \"projects\" WHERE project_name = 'Project Phoenix') AS phoenix,\n  (SELECT total_budget FROM \"projects\" WHERE project_name = 'Digital Transformation') AS digital_transformation;",
+        "success": false,
+        "error": "relation \"projects\" does not exist\nLINE 10:   (SELECT total_budget FROM \"projects\" WHERE project_name = ...\n                                     ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "e2be15f0-123c-40ec-b792-34a95f3739c2",
+        "query": "what is the number of demands in digital eng  practice",
+        "sql": "SELECT COUNT(*) \nFROM demands \nWHERE practice = 'Digital Eng Practice';",
+        "success": false,
+        "error": "column \"practice\" does not exist\nLINE 3: WHERE practice = 'Digital Eng Practice';\n              ^\nHINT:  Perhaps you meant to reference the column \"demands.practice_id\".\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "a6bdf365-8268-44f6-a012-d8e84cdd069e",
+        "query": "Find the resume URL for candidate 'Siddharth Dey'.",
+        "sql": "To fix the query, we need to identify the correct column name for the candidate's name. Let's assume the correct column name is `candidate_name`. \n\nSELECT resume_url FROM candidates WHERE candidate_name = 'Siddharth Dey';",
+        "success": false,
+        "error": "syntax error at or near \"To\"\nLINE 1: To fix the query, we need to identify the correct column nam...\n        ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "timestamp": 1769694452.3351505,
+        "query": "Show me all demands for the account 'Verizon Communications",
+        "sql": "SELECT d.* \nFROM demands d\nJOIN accounts a ON d.account_id = a.account_id\nWHERE a.account_name = 'Verizon Communications';",
+        "success": true,
+        "error": null
+    },
+    {
+        "timestamp": 1769694483.868858,
+        "query": "Find the email of the user 'Sayan",
+        "sql": "SELECT email FROM users WHERE name = 'Sayan';",
+        "success": true,
+        "error": null
+    },
+    {
+        "id": "fb32e217-dc0f-45b0-924b-57abc1eb6cf0",
+        "query": "List all 'Permanent' type hires",
+        "sql": "SELECT * \nFROM candidates \nWHERE type = 'Permanent';",
+        "success": false,
+        "error": "column \"type\" does not exist\nLINE 3: WHERE type = 'Permanent';\n              ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "timestamp": 1769695173.81318,
+        "query": "List all 'Permanent' type hires",
+        "sql": "SELECT * FROM Candidates \nWHERE candidate_id IN (\n  SELECT candidate_id FROM Demands \n  WHERE type_of_hire = 'Permanent'\n)",
+        "success": true,
+        "error": null
+    },
+    {
+        "id": "4306ed22-46c8-40cf-92fe-f804a004309e",
+        "query": "Show the description for the 'Cloud & DevOps' practice.",
+        "sql": "SELECT T2.description \nFROM demands AS T1 \nINNER JOIN practices AS T2 \nON T1.practice_id = T2.id \nWHERE T2.name = 'Cloud & DevOps';",
+        "success": false,
+        "error": "column t2.id does not exist\nLINE 4: ON T1.practice_id = T2.id \n                            ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "5d81af24-3546-44ec-b55d-84c8738f95b8",
+        "query": "Find the email of the user 'Sayan'.",
+        "sql": "SELECT email \nFROM candidates \nWHERE first_name = 'Sayan';",
+        "success": false,
+        "error": "column \"email\" does not exist\nLINE 1: SELECT email \n               ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "083cc0fc-8bff-4b45-8100-71a74736598e",
+        "query": "List all candidates with 5 years of experience.",
+        "sql": "SELECT * \nFROM candidates \nWHERE skills LIKE '%5 years%' OR skills LIKE '%5 year%' OR experience = '5';",
+        "success": false,
+        "error": "column \"experience\" does not exist\nLINE 3: ...lls LIKE '%5 years%' OR skills LIKE '%5 year%' OR experience...\n                                                             ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "ca33b3da-4697-4294-bd2e-1ca2bb864805",
+        "query": "Show the history of changes for Demand ID 88.",
+        "sql": "SELECT * \nFROM demand_history \nWHERE demand_id = 88 \nORDER BY change_date;",
+        "success": false,
+        "error": "relation \"demand_history\" does not exist\nLINE 2: FROM demand_history \n             ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "0c0acc28-122b-4dc0-9d7a-136d9592e635",
+        "query": "Find the email of the user 'Sayan'.",
+        "sql": "SELECT email FROM candidates WHERE first_name = 'Sayan';",
+        "success": false,
+        "error": "column \"email\" does not exist\nLINE 1: SELECT email FROM candidates WHERE first_name = 'Sayan';\n               ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "05211cb8-ff43-4b5e-8821-06a0a14d1d71",
+        "query": "Show the description for the 'Cloud & DevOps' practice.",
+        "sql": "SELECT T2.description \nFROM demands AS T1 \nINNER JOIN practices AS T2 \nON T1.practice_id = T2.id \nWHERE T2.name = 'Cloud & DevOps';",
+        "success": false,
+        "error": "column t2.id does not exist\nLINE 4: ON T1.practice_id = T2.id \n                            ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "5b2ff660-3daa-4cb1-9516-234ad4d9a978",
+        "query": "List all candidates with 5 years of experience.",
+        "sql": "SELECT candidate_id, first_name, last_name, skills, interview_status \nFROM candidates \nWHERE years_of_experience = 5;",
+        "success": false,
+        "error": "column \"years_of_experience\" does not exist\nLINE 3: WHERE years_of_experience = 5;\n              ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "id": "5cf91e94-7292-4136-b748-ccd2c63876f6",
+        "query": "Show the latest demand activities.",
+        "sql": "SELECT * \nFROM demand_activities \nORDER BY activity_date DESC \nLIMIT 1;",
+        "success": false,
+        "error": "relation \"demand_activities\" does not exist\nLINE 2: FROM demand_activities \n             ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "timestamp": 1769701088.4357953,
+        "query": "What is the email of the manager 'Komal Gupta'?",
+        "sql": "SELECT email FROM managers WHERE manager_name = 'Komal Gupta';",
+        "success": true,
+        "error": null
+    },
+    {
+        "timestamp": 1769701203.8704622,
+        "query": "Show the description for the 'Cloud & DevOps' practice.",
+        "sql": "SELECT description \nFROM practices \nWHERE practice_name = 'Cloud & DevOps';",
+        "success": true,
+        "error": null
+    }
 ]
