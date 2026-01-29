@@ -38,7 +38,7 @@ The codebase has been refactored from a flat structure into a standard Python pa
 *   **`tests/`**: Dedicated testing directory with `e2e` runners and `fixtures`.
 *   **`docs/`**: Centralized documentation (Architecture, Guides).
 
-### 5. FastAPI Integration
-A new guide and example implementation have been added to support exposing the chatbot as a REST API.
+### 5. FastAPI Integration (Deprecated)
+A guide was added for REST API support, but the implementation (`server.py`) is currently **deprecated** in favor of the CLI.
 *   **File:** `docs/fastapi_guide.md`
 *   **Features:** JSON serialization handling for Pandas DataFrames implementation.

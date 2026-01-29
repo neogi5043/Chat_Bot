@@ -36,6 +36,7 @@ Contains the core agents responsible for reasoning and execution.
 *   **`sql_generator.py`**: Consumes the plan and generates SQL.
 *   **`validator.py`**: Static analysis of generated SQL.
 *   **`correction_agent.py`**: Auto-corrects SQL based on error feedback.
+*   **`feedback_manager.py`**: Manages active learning history and few-shot examples.
 
 #### `src/semantic/`
 Configuration files defining the business domain.

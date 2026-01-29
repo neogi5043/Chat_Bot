@@ -50,7 +50,7 @@ User Query
 
 **Implementation**:
 ```
-semantic_layer/
+src/semantic/
 ├── business_metrics.json
 ├── data_dictionary.json
 ├── entity_mappings.json

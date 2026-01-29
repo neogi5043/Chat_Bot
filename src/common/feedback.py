@@ -18,7 +18,7 @@ class FeedbackManager:
                 return []
         return []
 
-    def log_feedback(self, query, sql, success, error_msg=None):
+    def log_feedback(self, query, sql, success, error_msg=None, exec_time_ms=None, row_count=None):
         """
         Log query execution result (Gratify/Penalize)
         """
@@ -27,7 +27,9 @@ class FeedbackManager:
             "query": query,
             "sql": sql,
             "success": success,
-            "error": error_msg
+            "error": error_msg,
+            "exec_time_ms": exec_time_ms,
+            "row_count": row_count
         }
         self.history.append(entry)
         self._save_history()

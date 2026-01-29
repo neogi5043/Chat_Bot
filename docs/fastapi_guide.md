@@ -1,3 +1,6 @@
+> [!WARNING]
+> **DEPRECATED**: The `server.py` implementation described here is currently deprecated and not maintained. The primary interface is the CLI (`app.py`).
+
 # How to Create a FastAPI Endpoint for the Chatbot
 
 This guide demonstrates how to expose the Demand Management Chatbot as a REST API using FastAPI.

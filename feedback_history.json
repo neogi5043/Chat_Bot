@@ -33,5 +33,14 @@
         "sql": "SELECT email FROM managers WHERE manager_name = 'Tina Paul';",
         "success": true,
         "error": null
+    },
+    {
+        "timestamp": 1769720535.510037,
+        "query": "no of open demands",
+        "sql": "SELECT COUNT(demand_id) FROM demands WHERE status = 'Open'",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 14691,
+        "row_count": 1
     }
 ]

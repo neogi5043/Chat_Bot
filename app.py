@@ -1,7 +1,20 @@
+import logging
 import time
 import pandas as pd
 from src.pipeline import chatbot
 from src.common import llm
+from src.common.constants import IntentType
+
+# Configure Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('chatbot.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 def print_user(msg):
     print(f"\n You: {msg}")
@@ -39,11 +52,12 @@ def main():
             sql_query, df, insights, intent = chatbot.pipeline(user_input, verbose=False)
             
             # Handle Based on Intent
-            if intent == "general_conversation":
+            # Handle Based on Intent
+            if intent == IntentType.GENERAL_CONVERSATION:
                 print_bot(insights)
                 continue
                 
-            elif intent == "error":
+            elif intent == IntentType.ERROR:
                 print_bot("I encountered an issue processing your request.")
                 if df is not None and not df.empty:
                      print_system(f"Error details: {df.iloc[0,0]}")
@@ -55,7 +69,7 @@ def main():
             # Success Case
             print_bot(insights)
             
-            if df is not None and not df.empty and intent == "sql":
+            if df is not None and not df.empty and intent == IntentType.SQL:
                 # Check if the result is just a message (e.g. empty result feedback)
                 if len(df.columns) == 1 and df.columns[0] == "Message":
                     print("\n" + df.iloc[0,0])
@@ -76,7 +90,13 @@ def main():
             
             if feedback == 'y':
                 # Reward
-                llm.feedback_manager.log_feedback(user_input, sql_query, True)
+                llm.feedback_manager.log_feedback(
+                    user_input, 
+                    sql_query, 
+                    True,
+                    exec_time_ms=int((time.time() - start_time) * 1000),
+                    row_count=len(df) if df is not None else 0
+                )
                 print_system("Thanks! I'll remember this for next time.")
                 
             elif feedback == 'n':
@@ -91,6 +111,7 @@ def main():
             print("\nExiting...")
             break
         except Exception as e:
+            logger.exception("Unhandled exception in main loop")
             print_system(f"Critical Error: {e}")
 
 if __name__ == "__main__":

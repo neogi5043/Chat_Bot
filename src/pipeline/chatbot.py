@@ -5,7 +5,7 @@ import time
 from src.common import llm  # Import local llm.py
 from src.common import db   # Import local db.py
 from src.prompts.prompt import INSIGHTS_GENERATION_PROMPT
-from . import post_execution_analyzer as analyzer
+from src.common.constants import IntentType
 
 # Simple query logger
 class QueryLogger:
@@ -78,7 +78,9 @@ def get_orchestrator():
         _orchestrator = TextToSQLOrchestrator()
     return _orchestrator
 
-def pipeline(query_request, verbose=True):
+from typing import Optional, Tuple, Any
+
+def pipeline(query_request: str, verbose: bool = True) -> Tuple[Optional[str], Optional[pd.DataFrame], Optional[str], str]:
     """
     New Entry Point: Delegates to TextToSQLOrchestrator.
     """
@@ -92,9 +94,10 @@ def pipeline(query_request, verbose=True):
     # We can keep using llm.classify_intent or better, force the orchestrator to handle it.
     # For now, let's fast-track greetings to keep it cheap.
     intent = llm.classify_intent(query_request)
-    if intent == "general_conversation":
+    intent = llm.classify_intent(query_request)
+    if intent == IntentType.GENERAL_CONVERSATION:
          response = llm.handle_general_conversation(query_request)
-         return None, None, response, "general"
+         return None, None, response, IntentType.GENERAL_CONVERSATION
 
     # Delegate to Orchestrator
     try:
@@ -118,7 +121,7 @@ def pipeline(query_request, verbose=True):
             if verbose:
                 print(f"[PIPELINE] Success in {duration:.2f}s")
             
-            return sql_query, df, insight, "sql"
+            return sql_query, df, insight, IntentType.SQL
             
         else:
             # Failure
@@ -128,12 +131,12 @@ def pipeline(query_request, verbose=True):
                 print(f"[PIPELINE] Failed: {error_msg}")
             
             err_df = pd.DataFrame([[error_msg]], columns=["Error"])
-            return sql, err_df, None, "error"
+            return sql, err_df, None, IntentType.ERROR
 
     except Exception as e:
         print(f"[PIPELINE] Critical Error: {e}")
         err_df = pd.DataFrame([[str(e)]], columns=["Error"])
-        return "", err_df, None, "error"
+        return "", err_df, None, IntentType.ERROR
 
 
 def get_stats():
@@ -189,11 +192,11 @@ def main():
         
         sql_query, df, insights, query_type = pipeline(query)
 
-        if query_type == "general":
+        if query_type == IntentType.GENERAL_CONVERSATION:
             print("\nType: General Conversation")
             print(f"\nResponse:\n{insights}")
             
-        elif query_type == "sql":
+        elif query_type == IntentType.SQL:
             print("\nType: SQL Query")
             print(f"\nGenerated SQL:\n{sql_query}")
             print(f"\n{'='*80}")

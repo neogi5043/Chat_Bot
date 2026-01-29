@@ -1,3 +1,8 @@
+"""
+DEPRECATED: FastAPI endpoint. Current implementation uses CLI (app.py).
+This file is kept for reference/future REST API implementation.
+Status: Not maintained
+"""
 # from fastapi import FastAPI, HTTPException
 # from pydantic import BaseModel
 # import uvicorn

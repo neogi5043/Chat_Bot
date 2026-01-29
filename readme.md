@@ -118,24 +118,21 @@ python verify_orchestrator.py
 
 ```
 C:\PROJECT\INTERNAL\GENAI_CHATBOT
-├── agents/                  # <--- NEW Multi-Agent Package
-│   ├── orchestrator.py      # Main pipeline controller
-│   ├── semantic_layer.py    # Interface to JSON definitions
-│   ├── schema_selector.py   # RAG for constraints/tables
-│   ├── entity_resolver.py   # Named Entity Recognition
-│   ├── decomposer.py        # Query Planner
-│   ├── sql_generator.py     # Code writer
-│   ├── validator.py         # Code reviewer
-│   ├── execution_engine.py  # Runtime
-│   ├── correction_agent.py  # Auto-fixer
-│   └── feedback_manager.py  # Active Learning
-├── semantic_layer/          # JSON Definitions
-│   ├── business_metrics.json
-│   ├── data_dictionary.json
-│   └── entity_mappings.json
-├── app.py                   # Main Entry Point
-├── chatbot.py               # Integration layer
-├── llm.py                   # Legacy LLM functions (deprecated logic)
+├── src/
+│   ├── agents/              # Multi-Agent Package
+│   │   ├── orchestrator.py
+│   │   ├── ...
+│   ├── pipeline/            # Core Pipeline
+│   │   ├── chatbot.py       # Integration layer
+│   ├── common/              # Shared Utilities
+│   │   ├── llm.py
+│   │   ├── db.py
+│   │   └── constants.py     # Intent Definitions
+│   └── prompts/             # Prompt Templates
+├── app.py                   # Main CLI Entry Point
+├── server.py                # [DEPRECATED] FastAPI Endpoint
+├── feedback_history.json    # Learning Logs
+├── chatbot.log              # Application Logs
 └── requirements.txt
 ```
 
