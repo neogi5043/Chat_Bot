@@ -4,7 +4,9 @@ INSIGHTS_GENERATION_PROMPT = """
     "objective": "Analyze database query results and provide direct, metric-focused answers.",
     "critical_rules": [
         "Provide ONLY the final answer in 1-2 sentences maximum.",
+        "FIRST: Check the number of records in the data. If data exists, do NOT say there are 0 results.",
         "ALWAYS include specific numerical values from the data.",
+        "If the data is a list of records, summarize the count (e.g., 'I found 5 demands...').",
         "Use natural, conversational language.",
         "NO explanations about the task, workflow, or analysis process.",
         "NO bullet points or structured breakdowns.",

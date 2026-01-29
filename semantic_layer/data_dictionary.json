@@ -32,6 +32,34 @@
                 "account_id": {
                     "type": "bigint",
                     "business_term": "Account ID"
+                },
+                "priority": {
+                    "type": "varchar",
+                    "business_term": "Priority"
+                },
+                "type_of_hire": {
+                    "type": "varchar",
+                    "business_term": "Hire Type"
+                },
+                "mode_of_hire": {
+                    "type": "varchar",
+                    "business_term": "Hire Mode"
+                },
+                "source": {
+                    "type": "varchar",
+                    "business_term": "Source"
+                },
+                "probability": {
+                    "type": "varchar",
+                    "business_term": "Probability"
+                },
+                "geo_location": {
+                    "type": "varchar",
+                    "business_term": "Location"
+                },
+                "billability": {
+                    "type": "varchar",
+                    "business_term": "Billable Status"
                 }
             }
         },

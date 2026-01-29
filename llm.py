@@ -316,6 +316,14 @@ FIX the SQL to address these errors. Return ONLY the corrected SQL."""
 def generate_insights(result_data, original_query=None):
     """Generates insights from query results using Groq"""
     
+    # Pre-process: Truncate large datasets to prevent Token Limit Exceeded
+    # The LLM only needs a sample to generate insights, not the full dump.
+    if hasattr(result_data, 'head'): # DataFrame
+        if len(result_data) > 15:
+            result_data = result_data.head(15)
+    elif isinstance(result_data, list) and len(result_data) > 15:
+        result_data = result_data[:15]
+    
     # 1. Convert result data to JSON string if it's a DataFrame
     if hasattr(result_data, 'to_json'):
         data_json = result_data.to_json(orient='records', indent=4)

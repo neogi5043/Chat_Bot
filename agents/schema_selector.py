@@ -43,10 +43,9 @@ class SchemaSelectorAgent:
         # Fallback: If no candidates, return everything (safe default for small schema involved in Phase 1)
         # Or better: return a default set.
         if not candidates:
-            # For this MVP, if we find nothing, let's look at the full schema 
-            # OR we can improve this logic. 
-            # Let's assume 'demand_details' or 'projects' are common.
-            pass
+            # Fallback: If no specific matches, return core tables to give LLM a chance
+            # rather than failing with 0 tables.
+            candidates = {"demands", "candidates", "accounts", "users"}
             
         # Expand with Joins (Simplified)
         # In a real graph, we'd traverse. Here we check 1-hop based on join_paths
