@@ -14,37 +14,37 @@ The system has moved away from a monolithic LLM call to a modular **Agent Swarm*
 
 ```mermaid
 graph TD
-    User[User Query] --> Orch[TextToSQL Orchestrator]
+    User["User Query"] --> Orch["TextToSQL Orchestrator"]
     
     subgraph "Phase 1: Understanding"
-        Orch --> Sem[Semantic Layer]
-        Orch --> Sel[Schema Selector<br/>(Keywords + Vector)]
-        Orch --> Ent[Entity Resolver]
+        Orch --> Sem["Semantic Layer"]
+        Orch --> Sel["Schema Selector<br/>(Keywords + Vector)"]
+        Orch --> Ent["Entity Resolver"]
     end
     
     subgraph "Phase 2: Planning & Generation"
-        Orch --> Dec[Decomposer Agent]
-        Dec --> Plan[Query Plan]
-        Plan --> Gen[SQL Generator Agent]
-        Gen --> SQL[Raw SQL]
+        Orch --> Dec["Decomposer Agent"]
+        Dec --> Plan["Query Plan"]
+        Plan --> Gen["SQL Generator Agent"]
+        Gen --> SQL["Raw SQL"]
     end
     
     subgraph "Phase 3: Validation & Execution"
-        SQL --> Val[Validator Agent]
-        Val -- Valid --> Exec[Execution Engine]
-        Val -- Invalid --> Corr[Correction Agent]
+        SQL --> Val["Validator Agent"]
+        Val -- Valid --> Exec["Execution Engine"]
+        Val -- Invalid --> Corr["Correction Agent"]
         Exec -- Error --> Corr
         Corr -- Fix --> Exec
     end
     
     subgraph "Phase 4: Learning"
-        Exec --> Feed[Feedback Manager]
-        Feed --> FewShot[Few-Shot Store]
-        FewShot -- High Priority Examples --> Gen
+        Exec --> Feed["Feedback Manager"]
+        Feed --> FewShot["Few-Shot Store"]
+        FewShot -- "High Priority Examples" --> Gen
     end
 
-    Exec --> Insight[Insight Generator]
-    Insight --> Final[Final Response]
+    Exec --> Insight["Insight Generator"]
+    Insight --> Final["Final Response"]
 ```
 
 ---
