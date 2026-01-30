@@ -27,6 +27,11 @@ class SQLGeneratorAgent:
     
     def generate_sql(self, query_plan, selected_schema, entity_resolutions, user_query) -> str:
         
+        # Get Few-Shot Examples (Correct & Incorrect)
+        correct_examples, incorrect_examples = [], []
+        if self.few_shot_manager:
+            correct_examples, incorrect_examples = self.few_shot_manager.get_similar_feedback(user_query)
+
         # Build prompt
         prompt = self._build_generation_prompt(
             user_query=user_query,
@@ -34,7 +39,9 @@ class SQLGeneratorAgent:
             selected_schema=selected_schema,
             entity_resolutions=entity_resolutions,
             business_metrics=self.semantic_layer.business_metrics,
-            sql_dialect="PostgreSQL"
+            sql_dialect="PostgreSQL",
+            correct_examples=correct_examples,
+            incorrect_examples=incorrect_examples
         )
         
         messages = [
@@ -45,7 +52,7 @@ class SQLGeneratorAgent:
         response = self.llm.invoke(messages)
         return self._extract_sql(response.content)
 
-    def _build_generation_prompt(self, user_query, query_plan, selected_schema, entity_resolutions, business_metrics, sql_dialect):
+    def _build_generation_prompt(self, user_query, query_plan, selected_schema, entity_resolutions, business_metrics, sql_dialect, correct_examples=None, incorrect_examples=None):
         
         # Format schema
         schema_str = ""
@@ -55,6 +62,18 @@ class SQLGeneratorAgent:
             schema_str += "Columns:\n"
             for col_name, col_meta in table.get("columns", {}).items():
                 schema_str += f"  - {col_name} ({col_meta.get('type')}): {col_meta.get('description', '')}\n"
+
+        # Format Examples
+        examples_str = ""
+        if correct_examples:
+            examples_str += "\n## Guidelines (Follow these patterns):\n"
+            for ex in correct_examples:
+                examples_str += f"Q: {ex.get('user_question')}\nSQL: {ex.get('sql')}\n\n"
+        
+        if incorrect_examples:
+            examples_str += "\n## Anti-Patterns (Avoid these mistakes):\n"
+            for ex in incorrect_examples:
+                examples_str += f"Q: {ex.get('query')}\nBAD SQL: {ex.get('sql')}\nError: {ex.get('error')}\n\n"
 
         prompt = f"""
 # Task: Generate SQL Query
@@ -73,7 +92,7 @@ class SQLGeneratorAgent:
 
 ## Query Decomposition Plan
 {json.dumps(query_plan.get('steps', []), indent=2)}
-
+{examples_str}
 ## Your Task
 Generate SQL for this question: "{user_query}"
 

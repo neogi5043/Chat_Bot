@@ -87,11 +87,28 @@ class FeedbackManager:
         ]
         
         # 2. Get Positive Examples (few-shots to emulate)
-        correct = [
-            item for item in self.few_shots 
-            if self._calculate_similarity(query, item['user_question']) > 0.3
-        ]
+        # Calculate scores first
+        scored_correct = []
+        for item in self.few_shots:
+            score = self._calculate_similarity(query, item['user_question'])
+            if score > 0.3:
+                scored_correct.append((score, item))
         
+        # Sort by score (ascending) so that [-top_k:] gives the highest scores
+        scored_correct.sort(key=lambda x: x[0])
+        correct = [item for _, item in scored_correct]
+        
+        # Do same for incorrect (mistakes to avoid)
+        scored_incorrect = []
+        for item in self.history:
+            if not item['success']:
+                score = self._calculate_similarity(query, item['query'])
+                if score > 0.3:
+                    scored_incorrect.append((score, item))
+        
+        scored_incorrect.sort(key=lambda x: x[0])
+        incorrect = [item for _, item in scored_incorrect]
+
         return correct[-top_k:], incorrect[-top_k:]
 
     def _calculate_similarity(self, q1, q2):
