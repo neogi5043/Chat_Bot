@@ -18,7 +18,7 @@ graph TD
     
     subgraph "Phase 1: Understanding"
         Orch --> Sem[Semantic Layer]
-        Orch --> Sel[Schema Selector]
+        Orch --> Sel[Schema Selector<br/>(Keywords + Vector)]
         Orch --> Ent[Entity Resolver]
     end
     
@@ -40,7 +40,7 @@ graph TD
     subgraph "Phase 4: Learning"
         Exec --> Feed[Feedback Manager]
         Feed --> FewShot[Few-Shot Store]
-        FewShot --> Gen
+        FewShot -- High Priority Examples --> Gen
     end
 
     Exec --> Insight[Insight Generator]
@@ -61,7 +61,7 @@ The "Brain" of the system. It abstracts the raw database schema into business co
 
 | Agent | Responsibility |
 |-------|----------------|
-| **SchemaSelector** | Filters the 50+ table schema down to the top-K relevant tables using simulated vector search. |
+| **SchemaSelector** | Filters the 50+ table schema down to the top-K relevant tables using **Keyword Overrides** + simulated vector search. |
 | **EntityResolver** | Detects named entities (projects, people) in the user query and maps them to IDs using fuzzy matching. |
 | **Decomposer** | Breaks down name, complex questions (e.g., "Compare X and Y") into logical steps. |
 | **SQLGenerator** | Writes the SQL. Uses strict **Chain-of-Thought** logic and injects relevant **Few-Shot Examples**. |

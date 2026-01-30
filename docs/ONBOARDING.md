@@ -113,6 +113,14 @@ The system is primarily **stateless** between queries, but **stateful** regardin
     *   *Issue*: Sometimes the LLM invents a column that doesn't exist.
     *   *Defense*: This is why `ValidationAgent` exists. It checks the generated SQL against the actual schema before execution. If you see execution errors, check if the Validator missed something.
 
+*   **4. The Schema Trap (Wrong Table Selected)**
+    *   *Issue*: Asking for "Resume Ratio" might select the `files` table instead of the `candidates` table.
+    *   *Fix*: Update `src/agents/schema_selector.py` implementation of `common_terms` OR improve descriptions in `data_dictionary.json`.
+
+*   **5. Fix it with Few-Shots**
+    *   *Issue*: logic is complex (e.g., "Cloud & Devops" needs a specific JOIN path).
+    *   *Fix*: Add a verified SQL example to `training_data/few_shot_examples.json`. The system PRIOTIZES these over its own logic.
+
 ---
 
 ## 🚀 6. How to Get Started (First 30 Minutes)

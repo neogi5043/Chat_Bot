@@ -162,11 +162,20 @@ class SchemaSelectorAgent:
     
     def select_schema(self, user_query: str) -> List[TableSchema]:
         """
-        1. Embed user query
-        2. Search vector DB for similar table names/descriptions
-        3. Add tables via foreign key relationships
-        4. Return condensed schema
+        1. Check "Common Terms" (Keyword Overrides)
+        2. Check Data Dictionary (Business Term Matching)
+        3. Fallback: Return Core Tables
         """
+        # Step 1: Keyword Overrides (Simulated vs Real)
+        candidates = set()
+        for term, tables in self.common_terms.items():
+            if term in user_query:
+                candidates.update(tables)
+        
+        # Step 2: Semantic/Dictionary Match
+        # ... logic ...
+        
+        return list(candidates)
         # Step 1: Semantic search
         query_embedding = embed(user_query)
         candidates = self.vector_db.search(
