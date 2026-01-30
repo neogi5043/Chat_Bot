@@ -1,0 +1,12 @@
+"id","cancelled_at","cancelled_by","demand_id","reason"
+1,2026-01-07 12:02:13.584,1,72,Client withdraws budget
+2,2026-01-07 12:09:55.157,1,64,Client withdraws budget
+3,2026-01-07 12:17:03.139,1,64,Client withdraws budget
+4,2026-01-07 13:42:34.390,1,18,Do not need demand
+5,2026-01-07 15:18:56.202,1,27,Do not need this demand
+6,2026-01-07 15:55:54.951,1,66,jgiybgiy
+7,2026-01-07 19:49:18.012,1,55,Client withdraws budget
+8,2026-01-07 21:30:01.422,1,18,Checking the history thing
+9,2026-01-10 18:49:26.900,1,72,For testing
+10,2026-01-10 19:53:48.426,1,70,testing purpose
+11,2026-01-20 15:07:25.127,1,71,just like that

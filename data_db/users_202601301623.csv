@@ -1,0 +1,7 @@
+"id","name","email","password","role","is_active"
+1,Satyaki Chatterjee,satyaki@gmail.com,$2a$10$de52.79RVRlTqL7MDvw9oObq0qDqYk1AGcyDpJQX.84PptiMd6PN6,ADMIN,true
+2,Sayan Shee,sayanshee2002@gmail.com,$2a$10$U2vUdCxdihZmIvhO35t3.uMqdMfXEAdNBAPHWTHSyD.THveoE6eCu,USER,true
+3,Raj Kapoor,rajshee2002@gmail.com,$2a$10$1qxJdsN3T/Lm91ZlNY/tOuaW9bSqbx/jFnn9SklGuK35eL8G1FjjK,ADMIN,true
+4,Sayan,sayan@gmail.com,$2a$10$cGD8pbiSl4kYFP3mpR/MIONZ7uXMf8oxQkkT/VNA9lQCSzQJAG5aC,USER,true
+6,Shuvangi De,shuvangide@gmail.com,$2a$10$4R7gTZfgJQZnK9JDJyJ8JOzRirmlAU/UJ5q/iLIIjbkJjxdUGnPdi,USER,true
+5,Siddharth Dey,siddharthdey2002@gmail.com,$2a$10$Cu5jM347LkErqKETZ3SO5uC.mu/M2K31/gSgVT5O1ZNeCFkDqQLnC,USER,true
