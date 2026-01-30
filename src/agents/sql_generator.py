@@ -45,7 +45,7 @@ class SQLGeneratorAgent:
         )
         
         messages = [
-            SystemMessage(content="You are an expert PostgreSQL developer. Output ONLY SQL."),
+            SystemMessage(content="You are an expert PostgreSQL developer. Output ONLY SQL. PRIORITIZE using the 'Guidelines' section for query patterns."),
             HumanMessage(content=prompt)
         ]
         

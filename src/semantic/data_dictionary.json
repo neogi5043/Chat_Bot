@@ -99,8 +99,8 @@
         },
         "candidates": {
             "table_id": "candidates",
-            "business_name": "Candidates",
-            "description": "Applicants applied to demands.",
+            "business_name": "Candidates / Resumes",
+            "description": "Applicants and Resumes applied to demands. Use this for candidate analysis and ratios.",
             "columns": {
                 "candidate_id": {
                     "type": "bigint",
@@ -222,8 +222,8 @@
         },
         "demand_cvs": {
             "table_id": "demand_cvs",
-            "business_name": "Resumes / CVs",
-            "description": "Metadata for uploaded candidate resumes.",
+            "business_name": "Resumes / CVs (File Metadata)",
+            "description": "Raw file metadata for uploaded candidate resumes. DO NOT use for analysis.",
             "columns": {
                 "demand_id": {
                     "type": "bigint",

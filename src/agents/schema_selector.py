@@ -13,9 +13,12 @@ class SchemaSelectorAgent:
         self.common_terms = {
             "demand_activity": ["history", "updated", "change", "audit", "log", "activity", "action", "detail", "activities"],
             "demand_cancellations": ["cancel", "reason", "revoked", "dropped", "cancelled", "canceling"],
-            "demand_cvs": ["resume", "cv", "file", "download", "attachment", "document"],
+            "demand_cvs": ["cv", "file", "download", "attachment", "document"],
+            "candidates": ["candidate", "applicant", "resume", "hiring", "interview"],
             "managers": ["manager", "lead", "owner"],
-            "users": ["user", "login", "admin", "role"]
+            "users": ["user", "login", "admin", "role"],
+            "practices": ["technology", "tech", "practice", "unit"],
+            "demands": ["demand", "position", "role", "job", "lifecycle"]
         }
     
     def select_schema(self, user_query: str) -> List[dict]:

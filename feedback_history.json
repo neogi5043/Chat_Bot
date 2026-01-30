@@ -1,0 +1,137 @@
+[
+    {
+        "id": "1f74606a-7e46-468a-9d8b-a76e94ce5851",
+        "query": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(*) * 1.0 / NULLIF((SELECT COUNT(DISTINCT demand_id) FROM demand_cvs WHERE status = 'Selected'), 0), 2) AS ratio \nFROM demand_cvs",
+        "success": false,
+        "error": "column \"status\" does not exist\nLINE 1: ...T COUNT(DISTINCT demand_id) FROM demand_cvs WHERE status = '...\n                                                             ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "timestamp": 1769776451.227979,
+        "query": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(*) * 1.0 / NULLIF(COUNT(CASE WHEN interview_status = 'SELECTED' THEN 1 END), 0), 2) as ratio FROM candidates",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 31347,
+        "row_count": 1
+    },
+    {
+        "timestamp": 1769776623.2569838,
+        "query": "What is the average fulfillment time for Cloud and devops",
+        "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.updated_at, CURRENT_TIMESTAMP) - d.created_at))/86400) as avg_days \nFROM demands d \nWHERE d.status = 'Fulfilled' AND d.job_description ILIKE '%Cloud%' AND d.job_description ILIKE '%DevOps%'",
+        "success": false,
+        "error": "User rejected result. Reason: wrong",
+        "exec_time_ms": null,
+        "row_count": null
+    },
+    {
+        "timestamp": 1769776909.8041482,
+        "query": "What is the average fulfillment time for cloud abd devops",
+        "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.updated_at, CURRENT_TIMESTAMP) - c.created_at))/86400) as avg_days \nFROM candidates c \nJOIN demands d ON c.candidate_id = d.demand_id \nWHERE c.skills ILIKE '%cloud%' AND c.skills ILIKE '%devops%' AND d.status = 'Fulfilled'",
+        "success": false,
+        "error": "User rejected result. Reason: n",
+        "exec_time_ms": null,
+        "row_count": null
+    },
+    {
+        "timestamp": 1769776942.2372806,
+        "query": "What is the average fulfillment time for cloud and devops",
+        "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.fulfilled_at, d.updated_at) - d.created_at))/86400) as avg_days \nFROM demands d \nJOIN practices p ON d.practice_id = p.practice_id \nWHERE (p.practice_name ILIKE '%Cloud%' AND p.practice_name ILIKE '%DevOps%') \nAND d.status = 'Fulfilled'",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 23856,
+        "row_count": 1
+    },
+    {
+        "timestamp": 1769777076.7667,
+        "query": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(DISTINCT demand_id) * 1.0 / NULLIF(COUNT(DISTINCT demand_id), 0), 2) as ratio FROM demand_cvs",
+        "success": false,
+        "error": "User rejected result. Reason: no",
+        "exec_time_ms": null,
+        "row_count": null
+    },
+    {
+        "id": "8fd47e95-9da2-4bf6-882e-cd60d4c4c28d",
+        "query": "What is the resume intake to select ratio",
+        "sql": "SELECT ROUND(COUNT(DISTINCT demand_id) * 1.0 / NULLIF(COUNT(CASE WHEN demand_id IN (SELECT demand_id FROM candidate_demand WHERE status = 'Joined') THEN 1 END), 0), 2) as ratio FROM demand_cvs",
+        "success": false,
+        "error": "relation \"candidate_demand\" does not exist\nLINE 1: ...UNT(CASE WHEN demand_id IN (SELECT demand_id FROM candidate_...\n                                                             ^\n",
+        "user_correction": null,
+        "timestamp": "TODO_TIMESTAMP"
+    },
+    {
+        "timestamp": 1769777286.2835763,
+        "query": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(candidate_id) * 1.0 / NULLIF(COUNT(CASE WHEN interview_status = 'SELECTED' THEN 1 END), 0), 2) as ratio FROM candidates",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 37787,
+        "row_count": 1
+    },
+    {
+        "timestamp": 1769779471.109965,
+        "query": "What is the most time taking phase in the demand life cycle technology wise?",
+        "sql": "WITH StatusDurations AS (\n  SELECT \n    da.demand_id, \n    da.action as status, \n    da.description as technology, \n    EXTRACT(EPOCH FROM (LEAD(da.created_at) OVER (PARTITION BY da.demand_id ORDER BY da.created_at) - da.created_at))/86400 as duration_days \n  FROM demand_activity da\n) \nSELECT technology, status, AVG(duration_days) as avg_duration \nFROM StatusDurations \nGROUP BY technology, status \nORDER BY avg_duration DESC;",
+        "success": false,
+        "error": "User rejected result. Reason: wrong",
+        "exec_time_ms": null,
+        "row_count": null
+    },
+    {
+        "timestamp": 1769779523.4825413,
+        "query": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(candidate_id) * 1.0 / NULLIF(COUNT(CASE WHEN interview_status = 'SELECTED' THEN 1 END), 0), 2) as ratio FROM candidates",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 19653,
+        "row_count": 1
+    },
+    {
+        "timestamp": 1769779575.5716138,
+        "query": "What is the most time taking phase in the demand life cycle technology wise?",
+        "sql": "WITH StatusDurations AS (\n  SELECT \n    d.demand_id, \n    da.action as status, \n    p.practice_name as technology, \n    EXTRACT(EPOCH FROM (LEAD(da.created_at) OVER (PARTITION BY d.demand_id ORDER BY da.created_at) - da.created_at))/86400 as duration_days \n  FROM demand_activity da \n  JOIN demands d ON da.demand_id = d.demand_id \n  JOIN practices p ON d.practice_id = p.practice_id \n  WHERE p.practice_name = 'Digital Engineering'\n) \nSELECT technology, status, AVG(duration_days) as avg_duration \nFROM StatusDurations \nGROUP BY technology, status \nORDER BY avg_duration DESC;",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 37920,
+        "row_count": 20
+    },
+    {
+        "timestamp": 1769779640.4123483,
+        "query": "What is the average fulfillment time for cloud & devops",
+        "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.fulfilled_at, d.updated_at) - d.created_at))/86400) as avg_days \nFROM demands d \nJOIN candidates c ON d.demand_id = c.candidate_id \nWHERE c.skills ILIKE '%cloud%' AND c.skills ILIKE '%devops%' AND d.status = 'Fulfilled'",
+        "success": false,
+        "error": "User rejected result. Reason: case",
+        "exec_time_ms": null,
+        "row_count": null
+    },
+    {
+        "timestamp": 1769780172.7729294,
+        "query": "What is the most time taking phase in the demand life cycle in digital  eng",
+        "sql": "WITH StatusDurations AS (\n  SELECT \n    d.demand_id, \n    da.action as status, \n    EXTRACT(EPOCH FROM (LEAD(da.created_at) OVER (PARTITION BY d.demand_id ORDER BY da.created_at) - da.created_at))/86400 as duration_days \n  FROM demand_activity da \n  JOIN demands d ON da.demand_id = d.demand_id \n  WHERE d.practice_id = (SELECT practice_id FROM practices WHERE practice_name ILIKE '%Digital%')\n) \nSELECT status, AVG(duration_days) as avg_duration \nFROM StatusDurations \nGROUP BY status \nORDER BY avg_duration DESC \nLIMIT 1",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 52519,
+        "row_count": 1
+    },
+    {
+        "timestamp": 1769780189.5406027,
+        "query": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(candidate_id) * 1.0 / NULLIF(COUNT(CASE WHEN interview_status = 'SELECTED' THEN 1 END), 0), 2) as ratio FROM candidates",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 15288,
+        "row_count": 1
+    },
+    {
+        "timestamp": 1769780338.6946838,
+        "query": "What is the average fulfillment time for cloud and devops",
+        "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.fulfilled_at, d.updated_at) - d.created_at))/86400) as avg_days \nFROM demands d \nJOIN practices p ON d.practice_id = p.practice_id \nWHERE p.practice_name ILIKE '%Cloud%' AND p.practice_name ILIKE '%DevOps%' AND d.status = 'Fulfilled'",
+        "success": true,
+        "error": null,
+        "exec_time_ms": 104416,
+        "row_count": 1
+    }
+]

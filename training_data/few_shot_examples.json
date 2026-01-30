@@ -1,7 +1,7 @@
 [
     {
         "id": "1",
-        "user_question": "What is the average fulfillment time for Cloud and devops?",
+        "user_question": "What is the average fulfillment time for cloud and devops?",
         "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.fulfilled_at, d.updated_at) - d.created_at))/86400) as avg_days FROM demands d JOIN practices p ON d.practice_id = p.practice_id WHERE p.practice_name ILIKE '%Cloud%' AND p.practice_name ILIKE '%DevOps%' AND d.status = 'Fulfilled'",
         "execution_success": true
     },
@@ -14,13 +14,25 @@
     {
         "id": "3",
         "user_question": "What is the most time taking phase in the demand life cycle technology wise?",
-        "sql": "WITH StatusDurations AS (SELECT d.demand_id, da.new_value as status, d.job_description as technology, EXTRACT(EPOCH FROM (LEAD(da.created_at) OVER (PARTITION BY d.demand_id ORDER BY da.created_at) - da.created_at))/86400 as duration_days FROM demands d JOIN demand_activity da ON d.demand_id = da.demand_id) SELECT technology, status, AVG(duration_days) as avg_duration FROM StatusDurations GROUP BY technology, status ORDER BY avg_duration DESC LIMIT 1",
+        "sql": "WITH StatusDurations AS (SELECT d.demand_id, da.action as status, p.practice_name as technology, EXTRACT(EPOCH FROM (LEAD(da.created_at) OVER (PARTITION BY d.demand_id ORDER BY da.created_at) - da.created_at))/86400 as duration_days FROM demand_activity da JOIN demands d ON da.demand_id = d.demand_id JOIN practices p ON d.practice_id = p.practice_id) SELECT technology, status, AVG(duration_days) as avg_duration FROM StatusDurations GROUP BY technology, status ORDER BY avg_duration DESC LIMIT 1",
         "execution_success": true
     },
     {
         "id": "4",
         "user_question": "What is the resume intake to select ratio in digital eng practice?",
         "sql": "SELECT ROUND((SELECT COUNT(DISTINCT c.candidate_id) FROM candidates c JOIN demands d ON c.demand_id = d.demand_id JOIN practices p ON d.practice_id = p.practice_id WHERE p.practice_name ILIKE '%Digital%') * 1.0 / NULLIF((SELECT COUNT(DISTINCT c.candidate_id) FROM candidates c JOIN demands d ON c.demand_id = d.demand_id JOIN practices p ON d.practice_id = p.practice_id WHERE p.practice_name ILIKE '%Digital%' AND c.interview_status = 'SELECTED'), 0), 2) as ratio",
+        "execution_success": true
+    },
+    {
+        "id": "5",
+        "user_question": "What is the resume intake to select ratio?",
+        "sql": "SELECT ROUND(COUNT(candidate_id) * 1.0 / NULLIF(COUNT(CASE WHEN interview_status = 'SELECTED' THEN 1 END), 0), 2) as ratio FROM candidates",
+        "execution_success": true
+    },
+    {
+        "id": "6",
+        "user_question": "What is the average fulfillment time for Cloud & Devops?",
+        "sql": "SELECT AVG(EXTRACT(EPOCH FROM (COALESCE(d.fulfilled_at, d.updated_at) - d.created_at))/86400) as avg_days FROM demands d JOIN practices p ON d.practice_id = p.practice_id WHERE p.practice_name ILIKE '%Cloud%' AND p.practice_name ILIKE '%DevOps%' AND d.status = 'Fulfilled'",
         "execution_success": true
     }
 ]
